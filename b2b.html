@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>렌티업 B2B | 법인·단체 가전 대량 렌탈 전문 서비스</title>
+    
+    <!-- 최신 라이브러리 로드 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Pretendard', 'sans-serif'] },
+                    colors: {
+                        navy: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        accent: '#38bdf8'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html { scroll-behavior: smooth; }
+        body { background-color: #020617; color: #f8fafc; word-break: keep-all; }
+        .glass-panel { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .text-gradient { background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .input-focus:focus { border-color: #38bdf8; box-shadow: 0 0 15px rgba(56, 189, 248, 0.2); outline: none; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- 헤더 -->
+    <header class="fixed top-0 w-full z-50 bg-navy-950/80 backdrop-blur-xl border-b border-white/5 py-5">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <span class="font-black text-2xl tracking-tighter uppercase italic">Renti-up <span class="text-accent">B2B</span></span>
+            </div>
+            <div class="hidden md:flex items-center gap-10">
+                <a href="#features" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">서비스 특징</a>
+                <a href="#benefits" class="text-sm font-medium text-gray-400 hover:text-white transition-colors">세제 혜택</a>
+                <a href="#quote-form" class="bg-accent hover:bg-sky-400 text-navy-950 font-black px-6 py-2.5 rounded-full text-sm transition-all transform hover:scale-105">
+                    대량 견적 문의
+                </a>
+            </div>
+            <div class="md:hidden text-accent font-bold">1688-1210</div>
+        </div>
+    </header>
+
+    <!-- 히어로 섹션 -->
+    <section class="pt-48 pb-32 relative overflow-hidden">
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/10 via-transparent to-transparent -z-10"></div>
+        <div class="container mx-auto px-6 text-center lg:text-left">
+            <div class="flex flex-col lg:flex-row items-center gap-20">
+                <div class="flex-1">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-accent/10 border border-accent/20 text-accent text-xs font-bold mb-8 uppercase tracking-widest">
+                        <i class="ph-bold ph-buildings"></i> Corporate Rental Solution
+                    </div>
+                    <h1 class="text-5xl md:text-7xl font-black leading-[1.1] mb-8 tracking-tighter">
+                        기업 성장의 파트너,<br>
+                        <span class="text-gradient">가전 대량 렌탈</span>의 기준
+                    </h1>
+                    <p class="text-xl text-slate-400 mb-12 leading-relaxed max-w-2xl font-light">
+                        오피스텔 원룸 단체 납품부터 오피스 집기 풀세팅까지.<br>
+                        초기 비용 부담 없이 최신 가전을 도입하고 법인세 절세 혜택까지 누리세요.
+                    </p>
+                    <div class="flex flex-wrap gap-4 justify-center lg:justify-start">
+                        <a href="#quote-form" class="bg-accent text-navy-950 font-black px-10 py-5 rounded-2xl text-lg shadow-xl shadow-accent/20 hover:bg-white transition-all transform hover:-translate-y-1">
+                            무료 견적 요청하기
+                        </a>
+                        <div class="flex items-center gap-3 px-8 py-5 text-gray-400 font-bold">
+                            상담 문의 <span class="text-white text-xl">1688-1210</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex-1 relative hidden lg:block">
+                    <div class="glass-panel p-4 rounded-[3rem] rotate-3 relative z-10">
+                        <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=1200" alt="Office" class="rounded-[2.5rem] shadow-2xl">
+                    </div>
+                    <div class="absolute -bottom-10 -left-10 glass-panel p-8 rounded-3xl z-20 animate-bounce">
+                        <div class="text-accent font-black text-4xl italic">100%</div>
+                        <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">Cost Deduction</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 특징 섹션 -->
+    <section id="features" class="py-32 bg-navy-900/30">
+        <div class="container mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="glass-panel p-12 rounded-[2.5rem] hover:bg-white/5 transition-all group">
+                    <div class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent text-3xl mb-8 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-calculator"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-5">비용 100% 처리</h3>
+                    <p class="text-slate-400 leading-relaxed">매월 납부하는 렌탈료는 법인 비용으로 전액 인정되어 소득세 및 법인세 절감 효과가 탁월합니다.</p>
+                </div>
+                <div class="glass-panel p-12 rounded-[2.5rem] hover:bg-white/5 transition-all group">
+                    <div class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent text-3xl mb-8 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-chart-line-up"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-5">재무 건전성 유지</h3>
+                    <p class="text-slate-400 leading-relaxed">렌탈은 부채로 인식되지 않아 기업 신용도에 영향을 주지 않으며 유동 자금을 효율적으로 운용할 수 있습니다.</p>
+                </div>
+                <div class="glass-panel p-12 rounded-[2.5rem] hover:bg-white/5 transition-all group">
+                    <div class="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center text-accent text-3xl mb-8 group-hover:scale-110 transition-transform">
+                        <i class="ph-fill ph-truck"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-5">전담 물류 및 설치</h3>
+                    <p class="text-slate-400 leading-relaxed">대량 계약 전문 팀이 투입되어 전국 어디든 신속하고 정확한 배송과 완벽한 설치를 보장합니다.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 상담 폼 -->
+    <section id="quote-form" class="py-32 relative">
+        <div class="container mx-auto px-6 max-w-4xl text-center">
+            <h2 class="text-4xl md:text-6xl font-black mb-6 tracking-tighter italic uppercase underline decoration-accent decoration-4 underline-offset-8">Get A Free Quote</h2>
+            <p class="text-xl text-slate-500 mb-16">상담 신청 즉시 B2B 전담 매니저가 최적의 견적을 제안합니다.</p>
+            
+            <form onsubmit="handleB2BSubmit(event)" class="glass-panel p-10 md:p-20 rounded-[4rem] text-left relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-accent/5 blur-3xl -z-10"></div>
+                
+                <div class="grid md:grid-cols-2 gap-8 mb-8">
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] ml-2">Company Name</label>
+                        <input type="text" name="업체명" placeholder="법인명 또는 단체명" required class="w-full bg-navy-950/50 border border-white/10 rounded-2xl px-8 py-5 text-lg input-focus">
+                    </div>
+                    <div class="space-y-3">
+                        <label class="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] ml-2">Manager Name</label>
+                        <input type="text" name="담당자명" placeholder="성함" required class="w-full bg-navy-950/50 border border-white/10 rounded-2xl px-8 py-5 text-lg input-focus">
+                    </div>
+                </div>
+                
+                <div class="mb-8 space-y-3">
+                    <label class="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] ml-2">Contact Number</label>
+                    <input type="tel" name="연락처" placeholder="010-0000-0000" required class="w-full bg-navy-950/50 border border-white/10 rounded-2xl px-8 py-5 text-lg input-focus">
+                </div>
+                
+                <div class="mb-12 space-y-3">
+                    <label class="text-[10px] font-black text-slate-600 uppercase tracking-[0.2em] ml-2">Requirements</label>
+                    <textarea name="상세내용" placeholder="필요 품목 및 예상 수량을 입력해주세요 (예: 냉장고 30대, 건조기 30대)" class="w-full bg-navy-950/50 border border-white/10 rounded-2xl px-8 py-5 text-lg h-40 input-focus"></textarea>
+                </div>
+                
+                <button type="submit" class="w-full bg-accent hover:bg-white text-navy-950 font-black text-2xl py-8 rounded-[2.5rem] shadow-2xl transition-all transform hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-4 group">
+                    B2B 맞춤 견적 신청하기 <i class="ph-bold ph-paper-plane-tilt group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+                </button>
+                
+                <p class="text-center mt-8 text-slate-600 text-sm">신속한 상담을 위해 <strong>1688-1210</strong>으로 직접 연락 주셔도 좋습니다.</p>
+            </form>
+        </div>
+    </section>
+
+    <!-- 푸터 -->
+    <footer class="py-20 border-t border-white/5 bg-navy-950 text-center">
+        <div class="container mx-auto px-6">
+            <div class="mb-10 opacity-40">
+                <span class="text-white font-black text-2xl italic tracking-tighter uppercase">Renti-up B2B Solution</span>
+            </div>
+            <p class="text-slate-700 text-[11px] font-bold tracking-[0.3em] uppercase mb-4">© 2026 Renti-up & Y-Rental. All rights reserved.</p>
+            <p class="text-slate-800 text-[11px]">사업자: 와이렌탈 | 전담 매니저: 전영주 (sbo20130@naver.com) | 고객센터: 1688-1210</p>
+        </div>
+    </footer>
+
+    <script>
+        async function handleB2BSubmit(event) {
+            event.preventDefault();
+            const form = event.target;
+            const submitBtn = form.querySelector('button');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-3xl"></i> 전송 중...';
+            submitBtn.disabled = true;
+
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            data._subject = "B2B_대량렌탈_견적문의_16881210";
+
+            try {
+                const response = await fetch("https://formsubmit.co/ajax/sbo20130@naver.com", {
+                    method: "POST",
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    alert("견적 요청이 성공적으로 접수되었습니다. 전영주 매니저가 곧 연락드리겠습니다!");
+                    form.reset();
+                } else {
+                    alert("전송 오류가 발생했습니다. 1688-1210으로 직접 문의 부탁드립니다.");
+                }
+            } catch (error) {
+                alert("네트워크 오류가 발생했습니다.");
+            } finally {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
