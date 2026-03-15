@@ -8,28 +8,18 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+        // ✅ Supabase 설정
+        const SUPABASE_URL = "https://nhyehgknkwwhebtprwzo.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5oeWVoZ2tua3d3aGVidHByd3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM1ODIyOTMsImV4cCI6MjA4OTE1ODI5M30.pfAcmyCDhSREXaIwlOy3RmqGfpmkBK1SiKN12ay8Ss0";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3A4xrFozCh10clw6hzhrgD7rRvXGojIU",
-            authDomain: "rentinp-172dd.firebaseapp.com",
-            projectId: "rentinp-172dd",
-            storageBucket: "rentinp-172dd.firebasestorage.app",
-            messagingSenderId: "176082975122",
-            appId: "1:176082975122:web:fdf0854bd01ec872b7e94b"
-        };
-
+        // ✅ Cloudinary 설정
         const CLOUD_NAME = "drj1oqz6g";
         const UPLOAD_PRESET = "jungsugi_unsigned";
+
+        // ✅ 텔레그램 설정
         const TELEGRAM_TOKEN = "8575001534:AAH9fUPVDfXmO2a_JcY0pdSD_S7V9tvSoTo";
         const TELEGRAM_CHAT_ID = "5369835092";
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
 
         async function sendTelegram(msg) {
             try {
@@ -61,6 +51,23 @@
             return data.secure_url;
         }
 
+        async function saveToSupabase(data) {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/contracts`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error('Supabase 저장 실패: ' + err);
+            }
+        }
+
         window.submitFinalContract = async function() {
             const name = document.getElementById('partnerName').value.trim();
             const phone = document.getElementById('partnerPhone').value.trim();
@@ -77,8 +84,6 @@
             btn.disabled = true;
 
             try {
-                await signInAnonymously(auth);
-
                 btn.innerText = "⏳ 신분증 업로드 중...";
                 const idCardUrl = await uploadToCloudinary(idCardFile);
                 btn.innerText = "⏳ 통장사본 업로드 중...";
@@ -90,12 +95,18 @@
                 const signatureImg = document.getElementById('signaturePad').toDataURL();
                 const address = (document.getElementById('roadAddress').value + " " + document.getElementById('detailAddress').value).trim();
 
-                await addDoc(collection(db, 'contracts'), {
-                    partnerName: name, partnerPhone: phone, partnerType: window.partnerType, address,
-                    bizName: window.partnerType === 'business' ? document.getElementById('partner_biz_name').value : "",
-                    bizNum: window.partnerType === 'business' ? document.getElementById('partner_biz_num').value : "",
-                    residentNum: window.partnerType === 'individual' ? document.getElementById('partner_resident_num').value : "",
-                    idCardUrl, bankBookUrl, bizLicUrl, signatureImg, createdAt: serverTimestamp()
+                await saveToSupabase({
+                    partner_name: name,
+                    partner_phone: phone,
+                    partner_type: window.partnerType,
+                    address,
+                    biz_name: window.partnerType === 'business' ? document.getElementById('partner_biz_name').value : null,
+                    biz_num: window.partnerType === 'business' ? document.getElementById('partner_biz_num').value : null,
+                    resident_num: window.partnerType === 'individual' ? document.getElementById('partner_resident_num').value : null,
+                    id_card_url: idCardUrl,
+                    bank_book_url: bankBookUrl,
+                    biz_lic_url: bizLicUrl,
+                    signature_img: signatureImg
                 });
 
                 btn.innerText = "⏳ 알림 전송 중...";
@@ -111,11 +122,7 @@
 
             } catch(e) {
                 console.error(e);
-                if (e.message.includes('Cloudinary')) {
-                    alert("파일 업로드 실패!\n\nCloudinary 설정 필요:\n① cloudinary.com 로그인\n② Settings → Upload → Upload presets\n③ Add upload preset\n④ Preset name: jungsugi_unsigned\n⑤ Signing Mode: Unsigned → Save");
-                } else {
-                    alert("오류 발생: " + e.message);
-                }
+                alert("오류 발생: " + e.message);
                 btn.disabled = false;
                 btn.innerText = "🚀 최종 계약 완료 및 서류 제출";
             }
@@ -128,7 +135,6 @@
         h1 { text-align: center; font-size: 26px; margin-bottom: 30px; border-bottom: 2px solid #222; padding-bottom: 15px; letter-spacing: 1px; }
         h2 { font-size: 16px; margin-top: 25px; border-left: 5px solid #2c3e50; padding-left: 10px; color: #2c3e50; font-weight: bold; margin-bottom: 10px; }
         p, li { font-size: 13px; line-height: 1.8; margin: 8px 0; text-align: justify; word-break: keep-all; }
-        ul { padding-left: 20px; margin: 10px 0; font-size: 12.5px; }
         .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
         .info-table th, .info-table td { border: 1px solid #ddd; padding: 10px; font-size: 13px; vertical-align: middle; }
         .info-table th { background-color: #f8f9fa; width: 30%; text-align: left; font-weight: 600; }
@@ -154,8 +160,6 @@
         .btn-final:hover { background: #1a252f; }
         .btn-final:disabled { background: #95a5a6; cursor: not-allowed; }
         .hidden { display: none !important; }
-
-        /* 완료 화면 */
         #completePage { display: none; width: 100%; max-width: 210mm; }
         .complete-banner { background: linear-gradient(135deg, #1a3c5e, #2c3e50); color: white; border-radius: 14px; padding: 32px 24px; text-align: center; margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
         .complete-banner .check { font-size: 54px; margin-bottom: 12px; }
@@ -166,7 +170,6 @@
         .btn-pdf-download { display: block; width: 100%; padding: 20px; background: linear-gradient(135deg, #e74c3c, #c0392b); color: #fff; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; font-family: inherit; cursor: pointer; margin-bottom: 20px; box-shadow: 0 6px 20px rgba(231,76,60,0.3); transition: opacity 0.2s; }
         .btn-pdf-download:hover { opacity: 0.88; }
         .btn-pdf-download:disabled { background: #aaa; cursor: not-allowed; box-shadow: none; }
-
         @media screen and (max-width: 768px) {
             body { padding: 10px; background: #fff; }
             .a4-paper { padding: 20px; box-shadow: none; border-radius: 0; }
@@ -191,7 +194,6 @@
 </head>
 <body>
 
-<!-- 작성 화면 -->
 <div id="formSection">
     <div class="type-selector no-print">
         <button type="button" class="type-btn active" id="type-indi" onclick="changeType('individual')">👤 개인 (프리랜서)</button>
@@ -295,19 +297,14 @@
         <div class="complete-name" id="completeName"></div>
         <p>서류가 안전하게 전송되었으며<br>대표님께 즉시 알림이 발송되었습니다.<br><br>아래 버튼을 눌러 내 계약서를 저장해두세요.</p>
     </div>
-
     <div class="no-print" style="width:100%;max-width:210mm;margin-bottom:4px">
         <div class="pdf-notice">
             📱 <strong>저장 방법 안내</strong><br>
             • <strong>안드로이드 / PC</strong> : 버튼 클릭 시 PDF 파일이 자동 다운로드됩니다.<br>
             • <strong>아이폰(iOS)</strong> : 팝업이 뜨면 <strong>"파일에 저장"</strong> 또는 <strong>"공유"</strong>를 선택해 저장하세요.
         </div>
-        <button class="btn-pdf-download" id="btnPdfDownload" onclick="downloadContractPDF()">
-            📥 내 계약서 PDF로 저장하기
-        </button>
+        <button class="btn-pdf-download" id="btnPdfDownload" onclick="downloadContractPDF()">📥 내 계약서 PDF로 저장하기</button>
     </div>
-
-    <!-- 완료 계약서 뷰 (PDF 캡처용) -->
     <div class="a4-paper" id="completedContractView"></div>
 </div>
 
@@ -316,7 +313,6 @@
     const dateStr = `${today.getFullYear()}년 ${today.getMonth()+1}월 ${today.getDate()}일`;
     document.getElementById('currentDate').innerText = dateStr;
 
-    // 서명 패드
     const canvas = document.getElementById('signaturePad');
     const ctx = canvas.getContext('2d');
     let drawing = false;
@@ -326,9 +322,7 @@
         const data = canvas.toDataURL();
         canvas.width = canvas.clientWidth || 150;
         canvas.height = canvas.clientHeight || 60;
-        if (window.hasSigned) {
-            const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = data;
-        }
+        if (window.hasSigned) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = data; }
     }
     window.addEventListener('load', resizeCanvas);
     window.addEventListener('resize', () => setTimeout(resizeCanvas, 100));
@@ -341,51 +335,34 @@
     }
     canvas.addEventListener('mousedown', (e) => { drawing = true; window.hasSigned = true; const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); });
     window.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
-    canvas.addEventListener('mousemove', (e) => {
-        if (!drawing) return;
-        const { x, y } = getPos(e);
-        ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
-        ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
-    });
-    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); drawing = true; window.hasSigned = true; if (!canvas.width) resizeCanvas(); const p = getPos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); }, { passive: false });
-    canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
-    canvas.addEventListener('touchmove', (e) => {
-        e.preventDefault(); if (!drawing) return;
-        const { x, y } = getPos(e);
-        ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#000';
-        ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y);
-    }, { passive: false });
-    window.clearSig = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); window.hasSigned = false; };
+    canvas.addEventListener('mousemove', (e) => { if (!drawing) return; const {x,y} = getPos(e); ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.strokeStyle='#000'; ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y); });
+    canvas.addEventListener('touchstart', (e) => { e.preventDefault(); drawing=true; window.hasSigned=true; if(!canvas.width) resizeCanvas(); const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }, {passive:false});
+    canvas.addEventListener('touchend', () => { drawing=false; ctx.beginPath(); });
+    canvas.addEventListener('touchmove', (e) => { e.preventDefault(); if(!drawing) return; const {x,y}=getPos(e); ctx.lineWidth=2.5; ctx.lineCap='round'; ctx.strokeStyle='#000'; ctx.lineTo(x,y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x,y); }, {passive:false});
+    window.clearSig = () => { ctx.clearRect(0,0,canvas.width,canvas.height); window.hasSigned=false; };
 
-    window.searchAddress = () => {
-        new daum.Postcode({ oncomplete: (data) => {
-            document.getElementById('postcode').value = data.zonecode;
-            document.getElementById('roadAddress').value = data.address;
-            document.getElementById('detailAddress').focus();
-        }}).open();
-    };
+    window.searchAddress = () => { new daum.Postcode({ oncomplete: (data) => { document.getElementById('postcode').value=data.zonecode; document.getElementById('roadAddress').value=data.address; document.getElementById('detailAddress').focus(); }}).open(); };
 
     window.partnerType = 'individual';
     window.changeType = (type) => {
         window.partnerType = type;
-        ['type-indi', 'type-biz'].forEach(id => document.getElementById(id).classList.remove('active'));
-        document.getElementById(type === 'individual' ? 'type-indi' : 'type-biz').classList.add('active');
-        document.getElementById('field-biz-name').classList.toggle('hidden', type === 'individual');
-        document.getElementById('field-biz-num').classList.toggle('hidden', type === 'individual');
-        document.getElementById('field-resident-num').classList.toggle('hidden', type === 'business');
-        document.getElementById('label-biz-file').classList.toggle('hidden', type === 'individual');
-        document.getElementById('bizLicense').classList.toggle('hidden', type === 'individual');
+        ['type-indi','type-biz'].forEach(id => document.getElementById(id).classList.remove('active'));
+        document.getElementById(type==='individual'?'type-indi':'type-biz').classList.add('active');
+        document.getElementById('field-biz-name').classList.toggle('hidden', type==='individual');
+        document.getElementById('field-biz-num').classList.toggle('hidden', type==='individual');
+        document.getElementById('field-resident-num').classList.toggle('hidden', type==='business');
+        document.getElementById('label-biz-file').classList.toggle('hidden', type==='individual');
+        document.getElementById('bizLicense').classList.toggle('hidden', type==='individual');
     };
 
-    // ✅ 완료 화면 전환
     window.showCompletePage = function(name) {
         const sig = document.getElementById('signaturePad').toDataURL();
-        const address = (document.getElementById('roadAddress').value + ' ' + document.getElementById('detailAddress').value).trim();
+        const address = (document.getElementById('roadAddress').value+' '+document.getElementById('detailAddress').value).trim();
         const phone = document.getElementById('partnerPhone').value;
         const type = window.partnerType;
-        const bizName = type === 'business' ? document.getElementById('partner_biz_name').value : '';
-        const bizNum = type === 'business' ? document.getElementById('partner_biz_num').value : '';
-        const resNum = type === 'individual' ? document.getElementById('partner_resident_num').value : '';
+        const bizName = type==='business' ? document.getElementById('partner_biz_name').value : '';
+        const bizNum = type==='business' ? document.getElementById('partner_biz_num').value : '';
+        const resNum = type==='individual' ? document.getElementById('partner_resident_num').value : '';
 
         document.getElementById('completeName').textContent = name + ' 파트너님';
         document.getElementById('completedContractView').innerHTML = `
@@ -393,9 +370,7 @@
             <p><strong>(주)정수기마켓</strong>(이하 "을"이라 한다)와 아래 인적사항의 <strong>파트너</strong>(이하 "갑"이라 한다)는 상호 신뢰와 우호적인 관계를 바탕으로 최상의 서비스를 제공하고 상호 매출 증대를 도모하기 위하여 다음과 같이 파트너 계약을 체결한다.</p>
             <h2>[파트너 정보 (갑)]</h2>
             <table class="info-table">
-                ${type === 'business'
-                    ? `<tr><th>상호명</th><td><strong>${bizName}</strong></td></tr><tr><th>사업자등록번호</th><td><strong>${bizNum}</strong></td></tr>`
-                    : `<tr><th>주민등록번호</th><td><strong>${resNum}</strong></td></tr>`}
+                ${type==='business' ? `<tr><th>상호명</th><td><strong>${bizName}</strong></td></tr><tr><th>사업자등록번호</th><td><strong>${bizNum}</strong></td></tr>` : `<tr><th>주민등록번호</th><td><strong>${resNum}</strong></td></tr>`}
                 <tr><th>성함 및 서명</th><td><div style="display:flex;align-items:center;gap:12px"><strong>${name}</strong><img src="${sig}" style="height:50px;border:1px solid #eee;border-radius:4px"></div></td></tr>
                 <tr><th>연락처</th><td><strong>${phone}</strong></td></tr>
                 <tr><th>주소</th><td><strong>${address}</strong></td></tr>
@@ -405,25 +380,19 @@
                 <tr><th>상호 (법인명)</th><td>(주)정수기마켓</td></tr>
                 <tr><th>사업자등록번호</th><td>574-86-03026</td></tr>
                 <tr><th>주소</th><td>대전광역시 유성구 유성대로 789 501호</td></tr>
-                <tr><th>대표자</th><td><div style="display:flex;align-items:center;gap:5px">김효상 (인)
-                    <img src="https://raw.githubusercontent.com/a01059651000-creator/rentin/main/%EC%A3%BC%EC%8B%9D%ED%9A%8C%EC%82%AC%20%EC%A0%95%EC%88%98%EA%B8%B0%EB%A7%88%EC%BC%93_%EB%8F%84%EC%9E%A5.png" style="width:50px;height:50px" crossorigin="anonymous">
-                </div></td></tr>
+                <tr><th>대표자</th><td><div style="display:flex;align-items:center;gap:5px">김효상 (인)<img src="https://raw.githubusercontent.com/a01059651000-creator/rentin/main/%EC%A3%BC%EC%8B%9D%ED%9A%8C%EC%82%AC%20%EC%A0%95%EC%88%98%EA%B8%B0%EB%A7%88%EC%BC%93_%EB%8F%84%EC%9E%A5.png" style="width:50px;height:50px" crossorigin="anonymous"></div></td></tr>
             </table>
             <h2>제 1 조 【계약의 목적】</h2><p>본 계약은 "을"이 취급하는 렌탈 상품에 대하여 "갑"에게 영업 활동을 위탁하고 필요한 제반 사항을 규정함을 목적으로 한다.</p>
-            <h2>제 2 조 【수수료 정산 및 지급】</h2><p>① 수수료 정산은 "을"이 정한 설치완료 데이터를 기준으로 하며, 익월 말일에 지급한다.<br>② ${type === 'individual' ? '개인 파트너는 수수료 총액에서 13.3%(부가가치세 및 사업소득세 포함)를 공제한 후 지급한다.' : '사업자 파트너는 수수료 총액에 부가가치세(10%)가 포함된 금액으로 정산하며 세금계산서 발행을 원칙으로 한다.'}</p>
+            <h2>제 2 조 【수수료 정산 및 지급】</h2><p>① 수수료 정산은 익월 말일에 지급한다.<br>② ${type==='individual' ? '개인 파트너는 수수료 총액에서 13.3%를 공제한 후 지급한다.' : '사업자 파트너는 부가가치세(10%) 포함 금액으로 정산하며 세금계산서 발행을 원칙으로 한다.'}</p>
             <h2>제 3 조 【분양몰 구축 및 호스팅 비용】</h2><p>영업용 분양몰 구축 및 호스팅 임대 비용으로 금 300,000원(VAT별도, 1년 기준)을 최초 1회 지급한다. 구축 시작 후 환불 불가하다.</p>
-            <h2>제 4 조 【수수료의 환수】</h2><p>고객의 렌탈 약정 기간 내 중도 해지, 철회 시 기 지급된 수수료는 렌탈사 정책에 따라 환수되며 "갑"은 이를 반환할 의무가 있다.</p>
-            <h2>제 5 조 【개인정보 보호 및 기밀 유지】</h2><p>"갑"은 업무 수행 중 취득한 모든 고객 정보를 관련 법령에 따라 보호하여야 하며, 영업 목적 외 사용이나 외부 유출 시 모든 책임을 진다.</p>
-            <h2>제 6 조 【계약 기간 및 자동 연장】</h2><p>본 계약은 체결일로부터 1년간 유효하며, 종료 30일 전까지 해지 통보가 없는 한 동일한 조건으로 1년 단위 자동 연장된다.</p>
-            <h2>제 7 조 【계약의 해지】</h2><p>신뢰 관계를 저해하는 행위 발생 시 "을"은 본 계약을 즉시 해지할 수 있다.</p>
-            <h2>제 8 조 【비밀의 유지】</h2><p>"갑"은 본 계약 이행 중 알게 된 업무상 비밀과 고객 정보를 제3자에게 누설해서는 아니 된다. 위반 시 민형사상 모든 책임을 진다.</p>
-            <h2>제 9 조 【관할법원】</h2><p>협의 불능 시 관할법원은 "을"의 소재지 관할법원으로 한다.</p>
-            <h2>제 10 조 【특약사항】</h2><p>합의된 특약이 있는 경우 이를 우선 적용하며, "갑"은 구축에 필요한 자료를 성실히 제공해야 한다.</p>
+            <h2>제 4 조 【수수료의 환수】</h2><p>중도 해지, 철회 시 기 지급된 수수료는 렌탈사 정책에 따라 환수되며 "갑"은 이를 반환할 의무가 있다.</p>
+            <h2>제 5 조 【개인정보 보호】</h2><p>"갑"은 고객 정보를 관련 법령에 따라 보호하여야 하며, 외부 유출 시 모든 책임을 진다.</p>
+            <h2>제 6 조 【계약 기간】</h2><p>본 계약은 1년간 유효하며, 해지 통보가 없는 한 1년 단위 자동 연장된다.</p>
+            <h2>제 7 조 ~ 제 10 조</h2><p>계약 해지, 비밀 유지, 관할법원(을 소재지), 특약사항 등 제반 조항은 본 계약 체결일 기준 원본 계약서에 준한다.</p>
             <div style="margin-top:40px;text-align:center;border-top:1px solid #eee;padding-top:24px;font-weight:bold">
                 <div style="font-size:17px;margin-bottom:8px">${dateStr}</div>
                 <p style="font-size:12px;color:#888">(본 계약서는 전자적 방식으로 체결되어 양측이 각각 보관한다)</p>
-            </div>
-        `;
+            </div>`;
 
         window._contractName = name;
         document.getElementById('formSection').style.display = 'none';
@@ -431,40 +400,28 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // ✅ PDF 다운로드
     window.downloadContractPDF = async function() {
         const btn = document.getElementById('btnPdfDownload');
-        btn.disabled = true;
-        btn.textContent = '⏳ PDF 생성 중... 잠시만 기다려주세요';
+        btn.disabled = true; btn.textContent = '⏳ PDF 생성 중...';
         try {
             const el = document.getElementById('completedContractView');
-            const cvs = await html2canvas(el, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false });
+            const cvs = await html2canvas(el, { scale:2, useCORS:true, allowTaint:true, backgroundColor:'#ffffff', logging:false });
             const imgData = cvs.toDataURL('image/jpeg', 0.92);
             const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+            const pdf = new jsPDF({ orientation:'p', unit:'mm', format:'a4' });
             const pW = pdf.internal.pageSize.getWidth();
             const pH = pdf.internal.pageSize.getHeight();
             const imgH = pW * (cvs.height / cvs.width);
-
             if (imgH <= pH) {
                 pdf.addImage(imgData, 'JPEG', 0, 0, pW, imgH);
             } else {
-                let yOffset = 0, remaining = imgH;
-                while (remaining > 0) {
-                    pdf.addImage(imgData, 'JPEG', 0, -yOffset, pW, imgH);
-                    remaining -= pH; yOffset += pH;
-                    if (remaining > 0) pdf.addPage();
-                }
+                let yOffset=0, remaining=imgH;
+                while(remaining > 0) { pdf.addImage(imgData,'JPEG',0,-yOffset,pW,imgH); remaining-=pH; yOffset+=pH; if(remaining>0) pdf.addPage(); }
             }
             const d = today;
-            const fn = `계약서_${window._contractName}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.pdf`;
-            pdf.save(fn);
-        } catch(e) {
-            alert('PDF 생성 오류: ' + e.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = '📥 내 계약서 PDF로 저장하기';
-        }
+            pdf.save(`계약서_${window._contractName}_${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}.pdf`);
+        } catch(e) { alert('PDF 생성 오류: '+e.message); }
+        finally { btn.disabled=false; btn.textContent='📥 내 계약서 PDF로 저장하기'; }
     };
 </script>
 </body>
