@@ -11,26 +11,26 @@
     <!-- Google Fonts (Pretendard) -->
     <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
     <style>
-        /* 모바일 최적화 및 튕김 방지 CSS (핵심 수정) */
+        /* 모바일 최적화 및 레이아웃 붕괴 방지 CSS */
         html, body {
             font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
             margin: 0;
             padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden; /* 브라우저 자체 스크롤 완벽 차단 */
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh; /* 모바일 브라우저 주소창/하단바 고려한 실제 높이 */
+            overflow: hidden; 
             background-color: #f3f4f6;
-            overscroll-behavior: none; /* 모바일 당겨서 새로고침 방지 */
-            -webkit-user-select: none; /* 텍스트 길게 눌러 블록 지정되는 것 방지 (선택 사항) */
+            overscroll-behavior: none; 
+            -webkit-user-select: none; 
             user-select: none;
         }
 
         #app-wrapper {
             position: relative;
-            width: 100%;
+            width: 100vw;
             height: 100%;
             overflow: hidden;
-            touch-action: pan-y; /* 세로 스크롤만 허용, 가로 스와이프는 커스텀 자바스크립트로 처리 */
         }
         
         #slider-container {
@@ -42,20 +42,22 @@
         }
 
         .slide {
-            width: 100%;
+            min-width: 100vw; /* 모바일 빈 화면(flex 붕괴) 방지용 강제 너비 지정 */
+            max-width: 100vw;
             height: 100%;
-            flex-shrink: 0; /* 중요: 슬라이드가 화면보다 작게 찌그러지는 현상 방지 */
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1rem;
             box-sizing: border-box;
-            opacity: 0.3;
-            transition: opacity 0.5s ease;
+            opacity: 0;
+            visibility: hidden; /* 보이지 않는 페이지 터치 방지 */
+            transition: opacity 0.4s ease, visibility 0.4s;
         }
 
         .slide.active {
             opacity: 1;
+            visibility: visible;
         }
 
         .content-card {
@@ -64,20 +66,19 @@
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 900px;
-            height: 85vh; /* 상하 여백을 위해 85%만 사용 */
-            overflow-y: auto; /* 카드 내용이 길면 내부 스크롤 허용 */
+            height: 85vh;
+            height: 85dvh; 
+            overflow-y: auto; 
             position: relative;
-            overscroll-behavior-y: contain; /* 카드 끝에서 스크롤 시 화면 전체가 들썩이는 현상 방지 */
-            -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+            overscroll-behavior-y: contain; 
+            -webkit-overflow-scrolling: touch; 
         }
 
-        /* 텍스트 내용 안에서는 선택 복사 허용 */
         .content-card * {
             -webkit-user-select: auto;
             user-select: auto;
         }
 
-        /* 스크롤바 디자인 */
         .content-card::-webkit-scrollbar {
             width: 6px;
         }
@@ -117,14 +118,27 @@
             background-color: #2563eb;
             transform: scale(1.3);
         }
+
+        /* AI Loader Animation */
+        .ai-loader {
+            border: 3px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 3px solid #8b5cf6;
+            width: 20px;
+            height: 20px;
+            -webkit-animation: spin 1s linear infinite;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Main Container -->
     <div id="app-wrapper">
-        
-        <!-- Slider Track -->
         <div id="slider-container">
             
             <!-- Page 1: 표지 -->
@@ -224,7 +238,7 @@
                                     <i data-lucide="factory" class="w-8 h-8 text-gray-500"></i>
                                 </div>
                                 <span class="font-bold text-gray-800">제조사/렌탈사</span>
-                                <p class="text-xs text-gray-500 mt-1">제품생산 / 설치 / A/S</p>
+                                <p class="text-xs text-gray-500 mt-1">제품생산 / 설치 / 관리</p>
                             </div>
                             
                             <i data-lucide="arrow-right" class="w-6 h-6 text-blue-400 hidden md:block"></i>
@@ -255,7 +269,7 @@
                         <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 md:p-6">
                             <h3 class="font-bold text-lg md:text-xl text-blue-900 mb-2">파트너의 역할 및 계약 구조</h3>
                             <p class="text-sm md:text-base text-gray-700 leading-relaxed">
-                                파트너는 재고를 쌓아두거나 배송, 설치, A/S를 신경 쓸 필요가 전혀 없습니다. <strong>오직 고객 유치와 맞춤 상담에만 집중</strong>하시면 됩니다. 무자본, 무점포로 시작 가능한 1인 대리점 시스템입니다.
+                                파트너는 재고를 쌓아두거나 배송, 설치 관리를 신경 쓸 필요가 전혀 없습니다. <strong>오직 고객 유치와 맞춤 상담에만 집중</strong>하시면 됩니다. 무자본, 무점포로 시작 가능한 1인 대리점 시스템입니다.
                             </p>
                         </div>
                     </div>
@@ -266,7 +280,7 @@
             <section class="slide">
                 <div class="content-card flex flex-col p-8 md:p-10 lg:p-16">
                     <span class="text-red-500 font-bold tracking-wider mb-2 text-sm md:text-base">04 / PROFIT (핵심)</span>
-                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 pb-4 border-b-2 border-gray-100">가장 중요한 '수익 구조'</h2>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 md:mb-8 pb-4 border-b-2 border-gray-100">가장 중요한 '수익 구조'</h2>
                     
                     <div class="flex flex-wrap gap-2 md:gap-3 mb-6">
                         <span class="px-3 py-1.5 md:px-4 md:py-2 bg-blue-100 text-blue-800 rounded-full text-xs md:text-sm font-bold">① 기본 렌탈 수수료</span>
@@ -274,7 +288,6 @@
                         <span class="px-3 py-1.5 md:px-4 md:py-2 bg-yellow-100 text-yellow-800 rounded-full text-xs md:text-sm font-bold">③ 추가 프로모션 인센티브</span>
                     </div>
 
-                    <!-- 환수 없음 강조 박스 -->
                     <div class="flex items-center gap-3 md:gap-4 bg-red-50 text-red-800 p-4 rounded-2xl mb-6 border border-red-200 shadow-sm">
                         <div class="bg-red-100 p-2 md:p-2.5 rounded-xl shrink-0">
                             <i data-lucide="shield-check" class="w-6 h-6 md:w-7 md:h-7 text-red-600"></i>
@@ -417,8 +430,8 @@
                         </div>
                         <div class="bg-gray-50 p-5 md:p-6 rounded-2xl">
                             <i data-lucide="wrench" class="w-7 h-7 md:w-8 md:h-8 text-blue-500 mb-3 md:mb-4"></i>
-                            <h3 class="font-bold text-base md:text-lg text-gray-900 mb-2">설치 및 A/S 관리</h3>
-                            <p class="text-xs md:text-sm text-gray-600">계약 이후 배송, 설치, 사후 A/S는 모두 해당 제조사(브랜드)에서 100% 전담합니다.</p>
+                            <h3 class="font-bold text-base md:text-lg text-gray-900 mb-2">설치 및 사후 관리</h3>
+                            <p class="text-xs md:text-sm text-gray-600">계약 이후 배송, 설치, 사후 관리는 모두 해당 제조사(브랜드)에서 100% 전담합니다.</p>
                         </div>
                     </div>
                 </div>
@@ -531,7 +544,6 @@
             <!-- Page 10: 마지막 페이지 -->
             <section class="slide">
                 <div class="content-card flex flex-col justify-center items-center p-8 md:p-10 lg:p-16 text-center bg-gray-900 text-white relative overflow-hidden">
-                    <!-- Background decoration -->
                     <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
                         <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500 rounded-full blur-3xl"></div>
                         <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500 rounded-full blur-3xl"></div>
@@ -565,13 +577,13 @@
         </button>
 
         <!-- Pagination Dots -->
-        <div class="absolute bottom-4 md:bottom-6 left-0 w-full flex justify-center gap-1.5 md:gap-2 z-50" id="pagination-dots">
+        <div class="absolute bottom-4 md:bottom-6 left-0 w-full flex justify-center gap-1.5 md:gap-2 z-50 flex-wrap px-4" id="pagination-dots">
             <!-- Dots will be generated by JS -->
         </div>
 
     </div>
 
-    <!-- JavaScript for Slider Logic -->
+    <!-- JavaScript for Slider Logic & Gemini API -->
     <script>
         // Initialize Lucide Icons
         lucide.createIcons();
@@ -589,17 +601,16 @@
             // Generate dots
             for(let i=0; i<totalSlides; i++) {
                 const dot = document.createElement('div');
-                dot.className = 'progress-dot w-2 h-2 rounded-full bg-gray-300 cursor-pointer shadow-sm';
+                dot.className = 'progress-dot w-2 h-2 md:w-2.5 md:h-2.5 rounded-full bg-gray-300 cursor-pointer shadow-sm flex-shrink-0';
                 dot.addEventListener('click', () => goToSlide(i));
                 dotsContainer.appendChild(dot);
             }
             const dots = document.querySelectorAll('.progress-dot');
 
             function updateSlider() {
-                // 정확히 컨테이너 크기(100%) 비율로 이동하도록 수정 (모바일 오류 해결)
-                sliderContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+                // 모바일 레이아웃 붕괴를 막기 위해 명시적인 100vw 값 사용
+                sliderContainer.style.transform = `translateX(-${currentSlide * 100}vw)`;
                 
-                // Update opacity for active class
                 slides.forEach((slide, index) => {
                     if(index === currentSlide) {
                         slide.classList.add('active');
@@ -608,11 +619,9 @@
                     }
                 });
 
-                // Update buttons state
                 prevBtn.disabled = currentSlide === 0;
                 nextBtn.disabled = currentSlide === totalSlides - 1;
 
-                // Update dots
                 dots.forEach((dot, index) => {
                     if(index === currentSlide) {
                         dot.classList.add('active');
@@ -631,11 +640,9 @@
                 }
             }
 
-            // Click events
             prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
             nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
 
-            // Keyboard events
             document.addEventListener('keydown', (e) => {
                 if(e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
                 if(e.key === 'ArrowRight') goToSlide(currentSlide + 1);
@@ -645,34 +652,29 @@
             let startX = 0;
             let startY = 0;
             let isDragging = false;
-            let isHorizontalSwipe = null; // null: 미확정, true: 가로 스와이프, false: 세로 스크롤
+            let isHorizontalSwipe = null; 
             
             sliderContainer.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
                 isDragging = true;
-                isHorizontalSwipe = null; // 터치 시작 시 방향 초기화
+                isHorizontalSwipe = null; 
             }, {passive: true});
 
-            // touchmove에 passive: false를 주어 preventDefault() 사용 가능하게 변경
             sliderContainer.addEventListener('touchmove', (e) => {
                 if (!isDragging) return;
 
                 const currentX = e.touches[0].clientX;
                 const currentY = e.touches[0].clientY;
-                
                 const diffX = startX - currentX;
                 const diffY = startY - currentY;
 
-                // 최초 5px 이상 움직였을 때 방향 확정
                 if (isHorizontalSwipe === null) {
                     if (Math.abs(diffX) > 5 || Math.abs(diffY) > 5) {
-                        // 가로 이동 거리가 세로 이동 거리보다 크면 가로 스와이프로 판단
                         isHorizontalSwipe = Math.abs(diffX) > Math.abs(diffY);
                     }
                 }
 
-                // 가로 스와이프로 확정된 경우, 브라우저 기본 동작(여백 노출, 뒤로가기 등) 차단
                 if (isHorizontalSwipe) {
                     e.preventDefault();
                 }
@@ -682,18 +684,15 @@
                 if (!isDragging) return;
                 isDragging = false;
                 
-                // 가로 스와이프였을 때만 슬라이드 전환 실행
                 if (isHorizontalSwipe) {
                     const currentX = e.changedTouches[0].clientX;
                     const diffX = startX - currentX;
-                    const swipeThreshold = 50; // 스와이프 인식 최소 거리
+                    const swipeThreshold = 50; 
 
                     if(Math.abs(diffX) > swipeThreshold) {
                         if(diffX > 0) {
-                            // 왼쪽으로 스와이프 (다음 페이지)
                             goToSlide(currentSlide + 1);
                         } else {
-                            // 오른쪽으로 스와이프 (이전 페이지)
                             goToSlide(currentSlide - 1);
                         }
                     }
@@ -702,7 +701,6 @@
                 isHorizontalSwipe = null;
             }, {passive: true});
 
-            // Initialize
             updateSlider();
         });
     </script>
