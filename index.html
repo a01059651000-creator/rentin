@@ -468,14 +468,17 @@
 
             const formData = new FormData(form);
             const data = Object.fromEntries(formData.entries());
-            data._subject = "창업자상담";
+           const name = data['이름'] || '';
+const phone = data['연락처'] || '';
+const interest = data['관심분야'] || '';
+const msg = `🚨 <b>새로운 상담 신청!</b>\n\n👤 <b>이름:</b> ${name}\n📞 <b>연락처:</b> ${phone}\n💡 <b>관심분야:</b> ${interest}\n\n🌐 <b>출처: 렌트인(rentin.life)</b>`;
 
-            try {
-                const response = await fetch("https://formsubmit.co/ajax/ddkds07@naver.com", {
-                    method: "POST",
-                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-                    body: JSON.stringify(data)
-                });
+try {
+    const response = await fetch('https://api.telegram.org/bot8575001534:AAH9fUPVDfXmO2a_JcY0pdSD_S7V9tvSoTo/sendMessage', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: '5369835092', text: msg, parse_mode: 'HTML' })
+    });
 
                 if (response.ok) {
                     const modal = document.getElementById('successModal');
