@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>렌트인 | 인터넷 가입 최대 48만원+@ 설치 당일 현금 지원</title>
+<meta name="description" content="KT, SKT, LG U+, 헬로, 스카이라이프 인터넷·TV 가입 시 설치 당일 현금 지원. 최대 48만원+@">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --blue:#1A6EFF;
+  --blue-dark:#0D47D9;
+  --yellow:#FFD600;
+  --red:#FF3B30;
+  --bg:#0A0F2C;
+  --white:#fff;
+}
+body{font-family:'Noto Sans KR',sans-serif;background:#fff;color:#111;overflow-x:hidden;}
+
+/* 상단바 */
+.topbar{background:var(--red);text-align:center;padding:10px;font-size:13px;font-weight:800;color:#fff;letter-spacing:0.3px;}
+.topbar span{color:var(--yellow);}
+
+/* 헤더 */
+.hdr{position:fixed;top:34px;width:100%;z-index:999;background:rgba(10,15,44,0.97);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.08);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;}
+.hdr-logo{color:#fff;font-weight:900;font-size:20px;letter-spacing:-1px;}
+.hdr-logo em{color:var(--yellow);font-style:normal;}
+.hdr-tel{color:var(--yellow);font-weight:900;font-size:17px;text-decoration:none;display:flex;align-items:center;gap:6px;}
+
+/* 히어로 */
+.hero{background:var(--bg);padding:130px 20px 80px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,110,255,0.35) 0%,transparent 70%);}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(to bottom,transparent,#fff);}
+
+.hero-inner{position:relative;z-index:2;max-width:760px;margin:0 auto;}
+
+.hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,214,0,0.12);border:1.5px solid rgba(255,214,0,0.35);color:var(--yellow);font-size:13px;font-weight:800;padding:7px 18px;border-radius:50px;margin-bottom:28px;}
+.hero-tag i{width:8px;height:8px;background:var(--yellow);border-radius:50%;animation:blink 1.2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
+
+.hero h1{font-size:clamp(30px,6.5vw,68px);font-weight:900;color:#fff;line-height:1.18;letter-spacing:-1.5px;margin-bottom:20px;}
+.hero h1 .y{color:var(--yellow);}
+.hero h1 .b{color:#5ba3ff;}
+
+.hero-desc{font-size:clamp(14px,2.2vw,18px);color:rgba(255,255,255,0.65);line-height:1.8;margin-bottom:36px;}
+.hero-desc strong{color:#fff;}
+
+.hero-btns{display:flex;flex-direction:column;align-items:center;gap:10px;}
+.btn-red{display:inline-block;background:linear-gradient(135deg,#ff3b30,#cc1500);color:#fff;font-size:18px;font-weight:900;padding:18px 52px;border-radius:14px;text-decoration:none;border:none;cursor:pointer;font-family:inherit;box-shadow:0 8px 32px rgba(255,59,48,0.45);transition:all .25s;letter-spacing:-0.3px;}
+.btn-red:hover{transform:translateY(-3px);box-shadow:0 14px 40px rgba(255,59,48,0.55);}
+.hero-small{color:rgba(255,255,255,0.4);font-size:12px;}
+
+/* 통신사 스크롤 배너 */
+.carrier-bar{background:#f4f7ff;border-top:2px solid #e0e8ff;border-bottom:2px solid #e0e8ff;padding:18px 0;overflow:hidden;white-space:nowrap;}
+.carrier-track{display:inline-flex;gap:24px;animation:marquee 18s linear infinite;}
+@keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.carrier-item{display:inline-flex;align-items:center;gap:8px;background:#fff;border:2px solid #dce8ff;border-radius:50px;padding:8px 22px;font-weight:800;font-size:14px;color:#1A6EFF;box-shadow:0 2px 8px rgba(26,110,255,0.08);}
+
+/* 숫자 임팩트 */
+.numbers{background:linear-gradient(135deg,#1A6EFF 0%,#0D47D9 100%);padding:56px 20px;}
+.numbers-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:2px;max-width:800px;margin:0 auto;}
+.num-item{text-align:center;padding:28px 16px;background:rgba(255,255,255,0.07);border-radius:16px;}
+.num-val{font-size:clamp(28px,5vw,52px);font-weight:900;color:#fff;letter-spacing:-1px;line-height:1;}
+.num-val em{font-size:0.55em;font-style:normal;color:var(--yellow);}
+.num-label{font-size:13px;color:rgba(255,255,255,0.7);margin-top:8px;font-weight:600;}
+
+/* 핵심 혜택 */
+.benefit{padding:70px 20px;background:#fff;}
+.sec-head{text-align:center;margin-bottom:48px;}
+.sec-tag{display:inline-block;background:#eff4ff;color:#1A6EFF;font-size:12px;font-weight:800;padding:5px 16px;border-radius:50px;margin-bottom:12px;letter-spacing:1px;}
+.sec-h{font-size:clamp(22px,4vw,40px);font-weight:900;color:#0A0F2C;line-height:1.3;}
+.sec-h em{color:#1A6EFF;font-style:normal;}
+.sec-h .red{color:var(--red);}
+
+.bene-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:20px;max-width:960px;margin:0 auto;}
+.bene-card{border-radius:20px;padding:30px 24px;position:relative;overflow:hidden;border:2px solid #edf0f7;}
+.bene-card.hot{background:linear-gradient(135deg,#fff8e6,#fffdf0);border-color:#FFD600;}
+.bene-card .hot-tag{position:absolute;top:16px;right:16px;background:var(--red);color:#fff;font-size:10px;font-weight:900;padding:3px 10px;border-radius:50px;}
+.bene-card .ico{font-size:36px;margin-bottom:14px;}
+.bene-card .big-num{font-size:clamp(32px,5vw,48px);font-weight:900;color:#1A6EFF;letter-spacing:-1px;line-height:1;}
+.bene-card .big-num.red{color:var(--red);}
+.bene-card .big-num span{font-size:0.4em;font-weight:700;}
+.bene-card h3{font-size:16px;font-weight:800;color:#0A0F2C;margin:8px 0 6px;}
+.bene-card p{font-size:13px;color:#666;line-height:1.65;}
+
+/* 왜 렌트인 */
+.why{background:#f4f7ff;padding:70px 20px;}
+.why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;max-width:960px;margin:0 auto;}
+.why-item{background:#fff;border-radius:20px;padding:28px 24px;display:flex;gap:18px;align-items:flex-start;box-shadow:0 4px 20px rgba(26,110,255,0.06);border:1.5px solid #e8eeff;}
+.why-ico{width:52px;height:52px;border-radius:14px;background:#eff4ff;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+.why-item h3{font-size:16px;font-weight:800;color:#0A0F2C;margin-bottom:6px;}
+.why-item p{font-size:13px;color:#666;line-height:1.65;}
+
+/* 비교표 */
+.compare{padding:70px 20px;background:#fff;}
+.compare-table{max-width:680px;margin:0 auto;border-radius:20px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.08);}
+.compare-table table{width:100%;border-collapse:collapse;}
+.compare-table thead th{padding:16px;font-size:14px;font-weight:800;}
+.compare-table thead th:first-child{background:#f4f7ff;color:#666;}
+.compare-table thead th:nth-child(2){background:#f4f7ff;color:#888;}
+.compare-table thead th:last-child{background:#1A6EFF;color:#fff;}
+.compare-table tbody td{padding:14px 16px;font-size:14px;text-align:center;border-bottom:1px solid #f0f0f0;}
+.compare-table tbody td:first-child{font-weight:700;background:#f9fafc;text-align:left;padding-left:20px;}
+.compare-table tbody td:last-child{font-weight:800;color:#1A6EFF;background:#f0f5ff;}
+.compare-table tbody td .x{color:#ff3b30;}
+.compare-table tbody td .o{color:#1A6EFF;}
+
+/* 가라 실시간 */
+.live{background:#0A0F2C;padding:48px 20px;}
+.live-box{max-width:520px;margin:0 auto;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px 24px;}
+.live-top{display:flex;align-items:center;gap:10px;margin-bottom:20px;}
+.live-dot{width:10px;height:10px;background:#06d6a0;border-radius:50%;animation:blink 1.2s infinite;}
+.live-ttl{color:#fff;font-weight:900;font-size:16px;}
+.live-cnt{margin-left:auto;color:rgba(255,255,255,0.4);font-size:12px;}
+.live-rows{display:flex;flex-direction:column;gap:10px;}
+.live-row{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border-radius:12px;padding:10px 14px;animation:fadeUp .4s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.live-badge{font-size:11px;font-weight:800;padding:3px 10px;border-radius:50px;white-space:nowrap;}
+.live-badge.done{background:rgba(6,214,160,0.15);color:#06d6a0;}
+.live-badge.ing{background:rgba(255,214,0,0.15);color:var(--yellow);}
+.live-name{color:#fff;font-weight:700;font-size:14px;}
+.live-phone{color:rgba(255,255,255,0.3);font-size:13px;margin-left:auto;}
+
+/* FAQ */
+.faq{padding:70px 20px;background:#f4f7ff;}
+.faq-list{max-width:700px;margin:0 auto;display:flex;flex-direction:column;gap:10px;}
+.faq-item{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.04);}
+.faq-q{padding:18px 20px;font-weight:700;font-size:15px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.faq-q .ql{color:#1A6EFF;font-weight:900;margin-right:4px;}
+.faq-arr{color:#bbb;transition:transform .2s;font-size:12px;}
+.faq-item.open .faq-arr{transform:rotate(180deg);}
+.faq-a{display:none;padding:0 20px 16px;font-size:14px;color:#555;line-height:1.75;border-top:1px solid #f0f0f0;padding-top:14px;}
+.faq-item.open .faq-a{display:block;}
+
+/* 폼 */
+.form-sec{background:linear-gradient(160deg,#0A0F2C 0%,#0d1f5c 100%);padding:80px 20px;}
+.form-inner{max-width:540px;margin:0 auto;}
+.form-sec .sec-h{color:#fff;}
+.form-sec .sec-tag{background:rgba(255,214,0,0.15);color:var(--yellow);}
+.form-sec .sec-head p{color:rgba(255,255,255,0.55);margin-top:10px;font-size:15px;}
+.fbox{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:24px;padding:36px 32px;margin-top:36px;}
+.fg{margin-bottom:16px;}
+.fg label{display:block;color:rgba(255,255,255,0.6);font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.fg input{width:100%;background:rgba(0,0,0,0.35);border:1.5px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px 16px;color:#fff;font-size:15px;font-family:inherit;outline:none;transition:.2s;}
+.fg input:focus{border-color:var(--yellow);}
+.fg input::placeholder{color:rgba(255,255,255,0.25);}
+.privacy-txt{background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px 14px;font-size:11px;color:rgba(255,255,255,0.35);line-height:1.75;max-height:80px;overflow-y:auto;margin-bottom:10px;}
+.pchk{display:flex;align-items:center;gap:8px;margin-bottom:20px;}
+.pchk input{width:16px;height:16px;accent-color:var(--yellow);flex-shrink:0;}
+.pchk label{color:rgba(255,255,255,0.55);font-size:13px;cursor:pointer;}
+.btn-submit{width:100%;background:linear-gradient(135deg,#ff3b30,#cc1500);color:#fff;font-size:18px;font-weight:900;padding:18px;border-radius:14px;border:none;cursor:pointer;font-family:inherit;transition:.25s;box-shadow:0 8px 28px rgba(255,59,48,0.35);}
+.btn-submit:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(255,59,48,0.45);}
+.btn-submit:disabled{background:#444;cursor:not-allowed;transform:none;box-shadow:none;}
+.form-tel-wrap{text-align:center;margin-top:20px;color:rgba(255,255,255,0.4);font-size:14px;}
+.form-tel-wrap a{color:var(--yellow);font-weight:900;font-size:22px;display:block;margin-top:4px;text-decoration:none;}
+
+/* 모달 */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:3000;align-items:center;justify-content:center;padding:20px;}
+.modal.open{display:flex;}
+.modal-box{background:#fff;border-radius:24px;padding:44px 32px;text-align:center;max-width:360px;width:100%;}
+.modal-box .ck{font-size:60px;margin-bottom:16px;}
+.modal-box h3{font-size:22px;font-weight:900;margin-bottom:8px;}
+.modal-box p{color:#666;font-size:14px;line-height:1.75;margin-bottom:24px;}
+.modal-close{width:100%;background:#1A6EFF;color:#fff;border:none;border-radius:12px;padding:15px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;}
+
+/* 푸터 */
+footer{background:#080c1e;padding:44px 20px;text-align:center;}
+footer p{color:#444;font-size:11px;line-height:2;}
+footer a{color:#555;text-decoration:none;}
+
+/* 고정버튼 */
+.fix-btn{position:fixed;bottom:20px;right:20px;z-index:998;background:linear-gradient(135deg,#ff3b30,#cc1500);color:#fff;font-weight:900;font-size:13px;padding:13px 22px;border-radius:50px;text-decoration:none;box-shadow:0 6px 24px rgba(255,59,48,0.45);display:flex;align-items:center;gap:6px;animation:bounce2 2s infinite;}
+@keyframes bounce2{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+@media(max-width:600px){
+  .topbar{font-size:11px;padding:8px 12px;}
+  .hdr{top:30px;padding:12px 16px;}
+  .hero{padding:120px 16px 60px;}
+  .bene-cards{grid-template-columns:1fr 1fr;}
+  .fbox{padding:24px 18px;}
+  .numbers-grid{grid-template-columns:1fr 1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- 상단 띠 -->
+<div class="topbar">🔥 오늘 신청 시 <span>설치 당일 현금 즉시 지급</span> · 선착순 마감 임박!</div>
+
+<!-- 헤더 -->
+<header class="hdr">
+  <div class="hdr-logo">렌트인 <em>인터넷</em></div>
+  <a href="tel:16615534" class="hdr-tel">📞 1661-5534</a>
+</header>
+
+<!-- 히어로 -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-tag"><i></i> 설치 당일 현금 즉시 지급</div>
+    <h1>
+      통신사 직접 가면<br>
+      <span class="y">손해 보는 거</span> 아세요?<br>
+      <span class="b">최대 48만원+@</span> 비밀 지원금
+    </h1>
+    <p class="hero-desc">
+      같은 통신사, 같은 요금제인데 <strong>받는 혜택이 다릅니다</strong><br>
+      KT · SKT · LG U+ · 헬로 · 스카이라이프<br>
+      렌트인 전문 상담사가 5개사 동시 비교 후 <strong>최저가로 연결</strong>
+    </p>
+    <div class="hero-btns">
+      <a href="#form" class="btn-red">📱 지금 바로 무료 상담 신청</a>
+      <p class="hero-small">* 상담 후 마음에 안 드시면 안 하셔도 됩니다</p>
+    </div>
+  </div>
+</section>
+
+<!-- 통신사 마퀴 -->
+<div class="carrier-bar">
+  <div class="carrier-track">
+    <div class="carrier-item">🔵 KT 인터넷</div>
+    <div class="carrier-item">🔴 SKT 인터넷</div>
+    <div class="carrier-item">🟣 LG U+ 인터넷</div>
+    <div class="carrier-item">🟢 헬로인터넷</div>
+    <div class="carrier-item">🛰️ 스카이라이프</div>
+    <div class="carrier-item">📺 인터넷+TV 결합</div>
+    <div class="carrier-item">🔵 KT 인터넷</div>
+    <div class="carrier-item">🔴 SKT 인터넷</div>
+    <div class="carrier-item">🟣 LG U+ 인터넷</div>
+    <div class="carrier-item">🟢 헬로인터넷</div>
+    <div class="carrier-item">🛰️ 스카이라이프</div>
+    <div class="carrier-item">📺 인터넷+TV 결합</div>
+  </div>
+</div>
+
+<!-- 숫자 임팩트 -->
+<section class="numbers">
+  <div class="numbers-grid">
+    <div class="num-item">
+      <div class="num-val">48<em>만원+@</em></div>
+      <div class="num-label">설치 당일 현금 지원</div>
+    </div>
+    <div class="num-item">
+      <div class="num-val">5<em>개사</em></div>
+      <div class="num-label">동시 비교 가능</div>
+    </div>
+    <div class="num-item">
+      <div class="num-val">0<em>원</em></div>
+      <div class="num-label">상담 수수료</div>
+    </div>
+    <div class="num-item">
+      <div class="num-val">당일<em>현금</em></div>
+      <div class="num-label">현금 당일 처리</div>
+    </div>
+  </div>
+</section>
+
+<!-- 핵심 혜택 -->
+<section class="benefit">
+  <div class="sec-head">
+    <div class="sec-tag">SPECIAL BENEFIT</div>
+    <h2 class="sec-h">렌트인 통해 가입하면<br><em>이런 혜택</em>을 드립니다</h2>
+  </div>
+  <div class="bene-cards">
+    <div class="bene-card hot">
+      <div class="hot-tag">🔥 HOT</div>
+      <div class="ico">💵</div>
+      <div class="big-num red">48<span>만원+@</span></div>
+      <h3>설치 당일 현금 지급</h3>
+      <p>설치 기사 방문 당일, 현금으로 즉시 지급. 기다릴 필요 없습니다!</p>
+    </div>
+    <div class="bene-card">
+      <div class="ico">📊</div>
+      <div class="big-num">5<span>개사</span></div>
+      <h3>통신사 동시 비교</h3>
+      <p>KT·SKT·LG·헬로·스카이라이프 한 번에 비교해 최저가 확정</p>
+    </div>
+    <div class="bene-card">
+      <div class="ico">🎁</div>
+      <div class="big-num">+<span>사은품</span></div>
+      <h3>추가 사은품 지급</h3>
+      <p>상담 신청 고객 한정, 비밀 사은품 추가 증정. 상담 시 공개!</p>
+    </div>
+    <div class="bene-card">
+      <div class="ico">🏆</div>
+      <div class="big-num">120<span>%</span></div>
+      <h3>최저 요금 보장제</h3>
+      <p>타사보다 비싸면 차액의 120% 보상. 그만큼 자신 있습니다</p>
+    </div>
+  </div>
+</section>
+
+<!-- 왜 렌트인 -->
+<section class="why">
+  <div class="sec-head">
+    <div class="sec-tag">WHY RENTIN</div>
+    <h2 class="sec-h">직접 통신사 가면 <span class="red">절대 못 받는</span><br>렌트인만의 혜택</h2>
+  </div>
+  <div class="why-grid">
+    <div class="why-item">
+      <div class="why-ico">💰</div>
+      <div>
+        <h3>비밀 현금 지원금</h3>
+        <p>통신사 직영점에서는 절대 알려주지 않는 추가 지원금이 있습니다. 금액은 상담 시 공개!</p>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-ico">⚡</div>
+      <div>
+        <h3>설치 당일 현금 즉시</h3>
+        <p>카드 적립, 포인트 NO! 설치 기사 방문 당일 현금으로 드립니다.</p>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-ico">🔍</div>
+      <div>
+        <h3>약정 조건 꼼꼼 검토</h3>
+        <p>불리한 약정 없이 최적 조건으로 가입. 위약금 함정 없습니다.</p>
+      </div>
+    </div>
+    <div class="why-item">
+      <div class="why-ico">📞</div>
+      <div>
+        <h3>전담 상담사 직접 배정</h3>
+        <p>가입 후에도 동일 담당자가 요금제 변경, AS 연계까지 책임집니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 비교표 -->
+<section class="compare">
+  <div class="sec-head">
+    <div class="sec-tag">COMPARE</div>
+    <h2 class="sec-h">직접 가입 vs 렌트인 가입<br><em>차이가 보입니다</em></h2>
+  </div>
+  <div class="compare-table">
+    <table>
+      <thead>
+        <tr>
+          <th>구분</th>
+          <th>통신사 직접 방문</th>
+          <th>렌트인 통해 가입</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>공시 지원금</td><td>✅ 동일</td><td>✅ 동일</td></tr>
+        <tr><td>비밀 현금 지원금</td><td><span class="x">❌ 없음</span></td><td><span class="o">✅ 최대 48만원+@</span></td></tr>
+        <tr><td>설치 당일 현금</td><td><span class="x">❌ 없음</span></td><td><span class="o">✅ 즉시 지급</span></td></tr>
+        <tr><td>추가 사은품</td><td><span class="x">❌ 없음</span></td><td><span class="o">✅ 별도 지급</span></td></tr>
+        <tr><td>5개사 비교</td><td><span class="x">❌ 불가</span></td><td><span class="o">✅ 한번에 비교</span></td></tr>
+        <tr><td>상담 비용</td><td>무료</td><td><span class="o">✅ 무료</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 가라 실시간 현황 -->
+<section class="live">
+  <div class="live-box">
+    <div class="live-top">
+      <div class="live-dot"></div>
+      <div class="live-ttl">실시간 상담 신청 현황</div>
+      <div class="live-cnt">오늘 기준</div>
+    </div>
+    <div class="live-rows" id="liveList"></div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq">
+  <div class="sec-head">
+    <div class="sec-tag">FAQ</div>
+    <h2 class="sec-h">자주 묻는 질문</h2>
+  </div>
+  <div class="faq-list">
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><div><span class="ql">Q.</span> 현금이 정말 설치 당일에 나오나요?</div><span class="faq-arr">▼</span></div>
+      <div class="faq-a">네, 맞습니다. 설치 기사 방문 당일 현금으로 즉시 지급해 드립니다. 카드 적립이나 포인트가 아닌 실제 현금입니다. 정확한 금액은 통신사·요금제에 따라 다르므로 상담을 통해 확인해 드립니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><div><span class="ql">Q.</span> 상담하면 무조건 가입해야 하나요?</div><span class="faq-arr">▼</span></div>
+      <div class="faq-a">전혀 아닙니다. 상담은 100% 무료이며 혜택 확인 후 마음에 드실 때만 가입하시면 됩니다. 어떠한 강요도 없습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><div><span class="ql">Q.</span> 현재 약정 중인데 상담 가능한가요?</div><span class="faq-arr">▼</span></div>
+      <div class="faq-a">가능합니다. 약정 만료 시점 확인, 위약금 면제 여부, 최적 전환 시점을 함께 안내해 드립니다. 지금 신청하셔도 손해 없습니다.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)"><div><span class="ql">Q.</span> 인터넷+TV 결합하면 더 저렴한가요?</div><span class="faq-arr">▼</span></div>
+      <div class="faq-a">대부분 결합 시 추가 할인이 적용됩니다. 스카이라이프 위성TV+인터넷 결합의 경우 특히 혜택이 크며, 가구 상황에 맞는 최적 조합을 제안해 드립니다.</div>
+    </div>
+  </div>
+</section>
+
+<!-- 폼 -->
+<section class="form-sec" id="form">
+  <div class="form-inner">
+    <div class="sec-head">
+      <div class="sec-tag">FREE CONSULTING</div>
+      <h2 class="sec-h">지금 바로 무료 상담 신청</h2>
+      <p>이름과 연락처만 남겨주세요.<br>전문 상담사가 직접 연락드립니다.</p>
+    </div>
+    <div class="fbox">
+      <form id="consultForm">
+        <div class="fg">
+          <label>이름</label>
+          <input type="text" id="uName" placeholder="홍길동" required>
+        </div>
+        <div class="fg">
+          <label>연락처</label>
+          <input type="tel" id="uPhone" placeholder="010-0000-0000" required maxlength="13">
+        </div>
+        <div class="privacy-txt">
+          <strong>[개인정보 수집 및 이용 동의]</strong><br>
+          수집항목: 이름, 연락처 / 이용목적: 인터넷·TV 가입 상담 및 혜택 안내<br>
+          보유기간: 상담 완료 후 즉시 파기<br>
+          개인정보처리자: (주)정수기마켓 | 사업자: 574-86-03026 | 대표: 김효상<br>
+          통신판매업신고: 2023-대전유성-0740호
+        </div>
+        <div class="pchk">
+          <input type="checkbox" id="pc" required checked>
+          <label for="pc">개인정보 수집 및 이용에 동의합니다 (필수)</label>
+        </div>
+        <button type="submit" class="btn-submit" id="submitBtn">📱 무료 상담 신청하기</button>
+      </form>
+      <div class="form-tel-wrap">
+        또는 바로 전화
+        <a href="tel:16615534">📞 1661-5534</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 푸터 -->
+<footer>
+  <p>
+    <strong style="color:#888">(주)정수기마켓</strong><br>
+    사업자등록번호: 574-86-03026 | 대표: 김효상<br>
+    주소: 대전광역시 유성구 유성대로 789 501호<br>
+    통신판매업신고번호: 2023-대전유성-0740호<br>
+    고객센터: <a href="tel:16615534">1661-5534</a> | ddkds07@naver.com<br><br>
+    © 2026 (주)정수기마켓. All rights reserved.
+  </p>
+</footer>
+
+<!-- 성공 모달 -->
+<div class="modal" id="successModal">
+  <div class="modal-box">
+    <div class="ck">✅</div>
+    <h3>신청 완료!</h3>
+    <p>상담 신청이 정상 접수되었습니다.<br>렌트인 전문 상담사가<br>빠른 시간 내 연락드리겠습니다.</p>
+    <button class="modal-close" onclick="document.getElementById('successModal').classList.remove('open')">확인</button>
+  </div>
+</div>
+
+<!-- 고정 버튼 -->
+<a href="#form" class="fix-btn">📱 무료상담 신청</a>
+
+<script>
+const TG_TOKEN = "8575001534:AAH9fUPVDfXmO2a_JcY0pdSD_S7V9tvSoTo";
+const TG_CHAT = "5369835092";
+
+// 전화번호 자동 하이픈
+document.getElementById('uPhone').addEventListener('input', function(){
+  let v = this.value.replace(/[^0-9]/g,'');
+  if(v.length<=3) this.value=v;
+  else if(v.length<=7) this.value=v.slice(0,3)+'-'+v.slice(3);
+  else this.value=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
+});
+
+// 폼 제출
+document.getElementById('consultForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const name = document.getElementById('uName').value.trim();
+  const phone = document.getElementById('uPhone').value.trim();
+  btn.disabled=true; btn.textContent='⏳ 신청 중...';
+  const msg = `📡 <b>인터넷 상담 신청!</b>\n\n👤 <b>이름:</b> ${name}\n📞 <b>연락처:</b> ${phone}\n\n🌐 <b>출처: 렌트인 인터넷</b>`;
+  try{
+    const r = await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`,{
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({chat_id:TG_CHAT, text:msg, parse_mode:'HTML'})
+    });
+    if(r.ok){ document.getElementById('successModal').classList.add('open'); this.reset(); }
+    else alert('전송 실패. 1661-5534로 연락해 주세요.');
+  }catch(e){ alert('오류 발생. 1661-5534로 연락해 주세요.'); }
+  finally{ btn.disabled=false; btn.textContent='📱 무료 상담 신청하기'; }
+});
+
+// FAQ
+function toggleFaq(el){ el.parentElement.classList.toggle('open'); }
+
+// 가라 실시간 현황
+const LN=['김','이','박','최','정','강','조','윤','장','임','한','오','서','신'];
+const ST=['신청완료','신청완료','신청완료','상담중','신청완료'];
+function rPhone(){ return '010-'+String(Math.floor(Math.random()*9000)+1000)+'-****'; }
+function rName(){ return LN[Math.floor(Math.random()*LN.length)]+(Math.random()>.5?'**':'*')+' 고객님'; }
+function addLive(){
+  const list = document.getElementById('liveList');
+  const row = document.createElement('div');
+  row.className='live-row';
+  const st=ST[Math.floor(Math.random()*ST.length)];
+  row.innerHTML=`<span class="live-badge ${st==='신청완료'?'done':'ing'}">${st}</span><span class="live-name">${rName()}</span><span class="live-phone">${rPhone()}</span>`;
+  list.insertBefore(row, list.firstChild);
+  if(list.children.length>6) list.removeChild(list.lastChild);
+}
+for(let i=0;i<6;i++) addLive();
+(function next(){ setTimeout(()=>{ addLive(); next(); }, Math.random()*4000+2000); })();
+</script>
+</body>
+</html>
