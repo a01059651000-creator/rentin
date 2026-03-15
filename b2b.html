@@ -6,14 +6,12 @@
     <title>렌트인 - 스마트한 기업의 선택, B2B 대량 렌탈</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         html { scroll-behavior: smooth; }
         .spinner { animation: rotate 2s linear infinite; }
         @keyframes rotate { 100% { transform: rotate(360deg); } }
-        /* 약관 내용 박스 애니메이션 */
         #privacyContent.hidden { display: none; }
     </style>
 </head>
@@ -24,7 +22,6 @@
             <img src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=2069" alt="Office Background" class="w-full h-full object-cover opacity-30" />
             <div class="absolute inset-0 bg-gradient-to-b from-slate-900/50 via-slate-900/80 to-slate-900"></div>
         </div>
-        
         <div class="relative z-10 max-w-5xl mx-auto px-4 text-center">
             <div class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-blue-500/20 border border-blue-400/30 text-blue-300 font-medium mb-8 backdrop-blur-md">
                 <span class="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
@@ -113,10 +110,6 @@
 
             <div class="bg-white rounded-3xl p-8 md:p-12 shadow-2xl" id="formContainer">
                 <form id="contactForm" class="space-y-6">
-                    <input type="hidden" name="_captcha" value="false">
-                    <input type="hidden" name="_template" value="table">
-                    <input type="hidden" name="_subject" value="[렌트인] 신규 B2B 렌탈 견적 신청건">
-
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-2">회사명(상호) *</label>
@@ -184,11 +177,14 @@
     <button onclick="scrollToContact()" class="fixed bottom-6 right-6 z-50 bg-[#253246] text-white w-20 h-20 rounded-2xl shadow-2xl flex items-center justify-center font-bold text-lg border border-white/10">문의<br/>하기</button>
 
     <script>
+        // ✅ 텔레그램 설정
+        const TELEGRAM_TOKEN = "8575001534:AAH9fUPVDfXmO2a_JcY0pdSD_S7V9tvSoTo";
+        const TELEGRAM_CHAT_ID = "5369835092";
+
         function scrollToContact() {
             document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
         }
 
-        // 개인정보 토글 함수
         function togglePrivacy() {
             const content = document.getElementById('privacyContent');
             content.classList.toggle('hidden');
@@ -200,22 +196,21 @@
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> 신청 중...';
 
-            const formData = {
-                회사명: document.getElementById('companyName').value,
-                담당자: document.getElementById('managerName').value,
-                연락처: document.getElementById('phoneNum').value,
-                지역: document.getElementById('region').value,
-                문의내용: document.getElementById('inquiry').value,
-                _subject: document.querySelector('input[name="_subject"]').value
-            };
+            const company = document.getElementById('companyName').value;
+            const manager = document.getElementById('managerName').value;
+            const phone = document.getElementById('phoneNum').value;
+            const region = document.getElementById('region').value;
+            const inquiry = document.getElementById('inquiry').value;
 
-            fetch("https://formsubmit.co/ajax/ddkds07@naver.com", {
-                method: "POST",
+            const msg = `🏢 <b>새로운 B2B 견적 신청!</b>\n\n🏢 <b>회사명:</b> ${company}\n👤 <b>담당자:</b> ${manager}\n📞 <b>연락처:</b> ${phone}\n📍 <b>지역:</b> ${region || '미입력'}\n📋 <b>문의내용:</b> ${inquiry}\n\n🌐 <b>출처: 렌트인 B2B(rentin.life/b2b)</b>`;
+
+            fetch(`https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`, {
+                method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'HTML' })
             })
             .then(res => {
-                if(res.ok) {
+                if (res.ok) {
                     document.getElementById('formContainer').innerHTML = `
                         <div class="text-center py-16">
                             <i class="fa-solid fa-circle-check text-5xl text-green-500 mb-6"></i>
@@ -223,9 +218,17 @@
                             <p class="text-slate-600 mb-8">담당자가 신속히 연락드리겠습니다.</p>
                             <button onclick="location.reload()" class="text-blue-600 font-semibold underline">새로고침</button>
                         </div>`;
+                } else {
+                    alert('전송에 실패했습니다. 잠시 후 다시 시도해주세요.');
+                    btn.disabled = false;
+                    btn.innerHTML = '무료 견적 신청하기';
                 }
             })
-            .catch(() => alert("오류가 발생했습니다."));
+            .catch(() => {
+                alert('오류가 발생했습니다.');
+                btn.disabled = false;
+                btn.innerHTML = '무료 견적 신청하기';
+            });
         });
     </script>
 </body>
