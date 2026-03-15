@@ -418,7 +418,7 @@ const firebaseConfig = {
     projectId: "rentinp-172dd",
     storageBucket: "rentinp-172dd.firebasestorage.app",
     messagingSenderId: "176082975122",
-    appId: "1:176082975122:web:b792b8ad175dfa6bb7e94b"
+    appId: "1:176082975122:web:fdf0854bd01ec872b7e94b"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -430,7 +430,7 @@ const appId = "rentinp-172dd";
 // 계약서 코드와 동일하게 맞춰주세요. 현재 계약서 코드도 함께 수정 필요!
 // collection(db, 'contracts')  ← 권장 경로
 // 아래는 기존 계약서 코드의 경로와 동일하게 유지 (오류 있으나 현행 데이터 위치)
-const CONTRACTS_REF = collection(db, 'artifacts', appId, 'public', 'data', 'contracts');
+const CONTRACTS_REF = collection(db, 'contracts');
 
 window._allContracts = [];
 window._filter = 'all';
