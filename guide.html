@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가전렌탈 파트너 창업 안내</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts (Pretendard) -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <style>
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+            margin: 0;
+            overflow: hidden; /* Prevent body scroll */
+            background-color: #f3f4f6;
+        }
+        
+        .slide {
+            min-width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            box-sizing: border-box;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Hide scrollbar for content card */
+        .content-card::-webkit-scrollbar {
+            width: 6px;
+        }
+        .content-card::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .content-card::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 20px;
+        }
+
+        #slider-container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .nav-btn {
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s;
+        }
+        .nav-btn:hover:not(:disabled) {
+            background-color: #2563eb;
+            color: white;
+            transform: translateY(-50%) scale(1.1);
+        }
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .progress-dot {
+            transition: all 0.3s;
+        }
+        .progress-dot.active {
+            background-color: #2563eb;
+            transform: scale(1.3);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Container -->
+    <div class="relative w-screen h-screen">
+        
+        <!-- Slider Track -->
+        <div id="slider-container">
+            
+            <!-- Page 1: 표지 -->
+            <section class="slide">
+                <div class="content-card flex flex-col justify-center items-center p-8 md:p-16 text-center bg-gradient-to-br from-blue-50 to-white">
+                    <div class="w-20 h-20 bg-blue-600 text-white rounded-2xl flex items-center justify-center mb-8 shadow-lg">
+                        <i data-lucide="store" class="w-10 h-10"></i>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 leading-tight">
+                        가전렌탈 파트너 <span class="text-blue-600">창업 안내</span>
+                    </h1>
+                    <p class="text-xl md:text-2xl text-gray-600 font-medium mb-10">
+                        부업 및 전업이 가능한 확실한 수익 모델
+                    </p>
+                    <div class="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-5 py-2.5 rounded-full font-semibold">
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i> 화면을 넘겨 내용을 확인하세요
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 2: 이 자료의 목적 -->
+            <section class="slide">
+                <div class="content-card flex flex-col p-8 md:p-16">
+                    <span class="text-blue-600 font-bold tracking-wider mb-2">01 / INTRODUCTION</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 pb-4 border-b-2 border-gray-100">이 자료의 목적</h2>
+                    
+                    <div class="flex-1 flex flex-col justify-center">
+                        <div class="bg-gray-50 p-8 rounded-2xl mb-8 border border-gray-100">
+                            <div class="flex items-start gap-4">
+                                <i data-lucide="info" class="w-8 h-8 text-blue-500 shrink-0 mt-1"></i>
+                                <div>
+                                    <h3 class="text-xl font-bold text-gray-800 mb-3">상담 전, 사업의 큰 그림을 그려드립니다</h3>
+                                    <p class="text-gray-600 leading-relaxed text-lg">
+                                        "이 자료는 가전렌탈 파트너 사업의 구조와 수익 모델을 쉽게 이해하기 위해 제작된 기초 안내서입니다."
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <ul class="space-y-4 text-gray-700 text-lg">
+                            <li class="flex items-center gap-3">
+                                <i data-lucide="check-circle-2" class="text-green-500 w-6 h-6"></i>
+                                <span>사업의 핵심 구조와 수익 방식을 먼저 파악할 수 있습니다.</span>
+                            </li>
+                            <li class="flex items-center gap-3">
+                                <i data-lucide="check-circle-2" class="text-green-500 w-6 h-6"></i>
+                                <span>실제 대면/전화 상담 시 본 자료를 바탕으로 <strong>추가적이고 구체적인 설명</strong>이 진행됩니다.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 3: 렌탈 시장 설명 -->
+            <section class="slide">
+                <div class="content-card flex flex-col p-8 md:p-16">
+                    <span class="text-blue-600 font-bold tracking-wider mb-2">02 / MARKET</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 pb-4 border-b-2 border-gray-100">렌탈 시장의 현재와 미래</h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 flex-1 items-center">
+                        <div class="space-y-6">
+                            <div class="p-6 bg-blue-50 rounded-xl">
+                                <h3 class="font-bold text-xl text-blue-900 mb-2 flex items-center gap-2">
+                                    <i data-lucide="trending-up" class="w-5 h-5 text-blue-600"></i> 폭발적인 시장 성장
+                                </h3>
+                                <p class="text-gray-700">1인 가구 증가, 초기 비용 부담 감소, 지속적인 관리 니즈로 인해 소유에서 '구독(렌탈)'으로 소비 트렌드가 완전히 변화했습니다.</p>
+                            </div>
+                            <div class="p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
+                                <h3 class="font-bold text-xl text-gray-900 mb-2 flex items-center gap-2">
+                                    <i data-lucide="users" class="w-5 h-5 text-gray-600"></i> 왜 파트너가 필요한가?
+                                </h3>
+                                <p class="text-gray-700">수많은 브랜드와 제품 속에서 고객은 자신에게 맞는 상품을 찾기 어려워합니다. 고객의 니즈를 파악하고 최적의 상품을 매칭해 줄 <strong>'전문 판매 파트너'</strong>의 역할이 그 어느 때보다 중요합니다.</p>
+                            </div>
+                        </div>
+                        <div class="flex justify-center">
+                            <div class="relative w-64 h-64 bg-white rounded-full border-8 border-blue-100 flex items-center justify-center shadow-lg">
+                                <div class="text-center">
+                                    <span class="block text-5xl font-extrabold text-blue-600 mb-2">40조+</span>
+                                    <span class="text-gray-500 font-medium">국내 렌탈 시장 규모<br>(지속 성장 중)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 4: 사업 구조 -->
+            <section class="slide">
+                <div class="content-card flex flex-col p-8 md:p-16">
+                    <span class="text-blue-600 font-bold tracking-wider mb-2">03 / STRUCTURE</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 pb-4 border-b-2 border-gray-100">한눈에 보는 사업 구조</h2>
+                    
+                    <div class="flex flex-col flex-1 justify-center">
+                        <!-- 구조도 -->
+                        <div class="flex flex-col md:flex-row items-center justify-between bg-gray-50 p-6 md:p-10 rounded-2xl mb-10 gap-4 md:gap-0">
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-white rounded-full shadow-md flex items-center justify-center mx-auto mb-3 border border-gray-200">
+                                    <i data-lucide="factory" class="w-8 h-8 text-gray-500"></i>
+                                </div>
+                                <span class="font-bold text-gray-800">제조사/렌탈사</span>
+                                <p class="text-xs text-gray-500 mt-1">제품생산 / 설치 / A/S</p>
+                            </div>
+                            
+                            <i data-lucide="arrow-right" class="w-8 h-8 text-blue-400 hidden md:block"></i>
+                            <i data-lucide="arrow-down" class="w-8 h-8 text-blue-400 md:hidden"></i>
+                            
+                            <div class="text-center relative">
+                                <div class="absolute -top-3 -right-3 bg-blue-500 text-white text-xs font-bold px-2 py-1 rounded-full animate-bounce">수익발생</div>
+                                <div class="w-24 h-24 bg-blue-600 rounded-full shadow-lg flex items-center justify-center mx-auto mb-3 ring-4 ring-blue-100">
+                                    <i data-lucide="user-check" class="w-10 h-10 text-white"></i>
+                                </div>
+                                <span class="font-bold text-blue-700 text-lg">파트너 (귀하)</span>
+                                <p class="text-xs text-gray-500 mt-1">영업 / 상담 / 계약</p>
+                            </div>
+
+                            <i data-lucide="arrow-right" class="w-8 h-8 text-blue-400 hidden md:block"></i>
+                            <i data-lucide="arrow-down" class="w-8 h-8 text-blue-400 md:hidden"></i>
+
+                            <div class="text-center">
+                                <div class="w-20 h-20 bg-white rounded-full shadow-md flex items-center justify-center mx-auto mb-3 border border-gray-200">
+                                    <i data-lucide="home" class="w-8 h-8 text-gray-500"></i>
+                                </div>
+                                <span class="font-bold text-gray-800">고객</span>
+                                <p class="text-xs text-gray-500 mt-1">상품 이용 / 월 렌탈료 납부</p>
+                            </div>
+                        </div>
+
+                        <!-- 설명 -->
+                        <div class="bg-blue-50 border border-blue-100 rounded-xl p-6">
+                            <h3 class="font-bold text-xl text-blue-900 mb-3">파트너의 역할 및 계약 구조</h3>
+                            <p class="text-gray-700 leading-relaxed">
+                                파트너는 재고를 쌓아두거나 배송, 설치, A/S를 신경 쓸 필요가 전혀 없습니다. <strong>오직 고객 유치와 맞춤 상담에만 집중</strong>하시면 됩니다. 무자본, 무점포로 시작 가능한 1인 대리점 시스템입니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 5: 수익 구조 -->
+            <section class="slide">
+                <div class="content-card flex flex-col p-8 md:p-16">
+                    <span class="text-red-500 font-bold tracking-wider mb-2">04 / PROFIT (핵심)</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-6 pb-4 border-b-2 border-gray-100">가장 중요한 '수익 구조'</h2>
+                    
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">① 기본 렌탈 수수료</span>
+                        <span class="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-bold">② 상조 결합 수수료 (고수익)</span>
+                        <span class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full text-sm font-bold">③ 추가 프로모션 인센티브</span>
+                    </div>
+
+                    <div class="flex items-center gap-4 bg-red-50 text-red-800 p-4 md:p-5 rounded-2xl mb-6 border border-red-200 shadow-sm">
+                        <div class="bg-red-100 p-2.5 rounded-xl shrink-0">
+                            <i data-lucide="shield-check" class="w-7 h-7 text-red-600"></i>
+                        </div>
+                        <div>
+                            <p class="font-extrabold text-lg md:text-xl flex items-center gap-1">
+                                안심 보장: 수수료 환수 <span class="text-red-600">0%</span>
+                            </p>
+                            <p class="text-sm md:text-base mt-1 text-red-700/80">고객이 요금을 미납하더라도 지급된 파트너님의 수익금은 절대 환수되지 않습니다.</p>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-600 mb-6 font-medium">건당 평균 수수료 <strong class="text-blue-600 text-lg">40~50만원</strong> 기준 월 수익 예시 (상품/결합에 따라 변동)</p>
+
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <!-- Card 1 -->
+                        <div class="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition">
+                            <div class="text-gray-500 font-semibold mb-2">부업/초기 (월 1건)</div>
+                            <div class="text-3xl font-extrabold text-gray-900 mb-4">약 40~50<span class="text-lg text-gray-500 font-normal">만원</span></div>
+                            <ul class="text-sm text-gray-600 space-y-2">
+                                <li>• 주변 지인 및 가족 대상 영업</li>
+                                <li>• 가전제품 단품 위주</li>
+                                <li>• 가벼운 용돈 벌이 수준</li>
+                            </ul>
+                        </div>
+                        <!-- Card 2 -->
+                        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6 shadow-md relative">
+                            <div class="absolute -top-3 right-4 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">가장 현실적</div>
+                            <div class="text-blue-800 font-semibold mb-2">안정화 단계 (월 5건)</div>
+                            <div class="text-3xl font-extrabold text-blue-600 mb-4">약 200~250<span class="text-lg text-blue-400 font-normal">만원</span></div>
+                            <ul class="text-sm text-gray-700 space-y-2">
+                                <li>• 블로그/SNS 홍보 병행</li>
+                                <li>• 고단가 가전 + 상조 결합 진행</li>
+                                <li>• 든든한 제 2의 월급</li>
+                            </ul>
+                        </div>
+                        <!-- Card 3 -->
+                        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 shadow-lg text-white">
+                            <div class="text-gray-400 font-semibold mb-2">전업/프로 (월 10건 이상)</div>
+                            <div class="text-3xl font-extrabold text-yellow-400 mb-4">400~500<span class="text-lg text-gray-400 font-normal">만원+</span></div>
+                            <ul class="text-sm text-gray-300 space-y-2">
+                                <li>• 적극적인 온/오프라인 영업</li>
+                                <li>• 제휴점 영업, 법인(사무실) 영업</li>
+                                <li>• 확실한 본업 수준의 수익</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 6: 활동 방식 -->
+            <section class="slide">
+                <div class="content-card flex flex-col p-8 md:p-16">
+                    <span class="text-blue-600 font-bold tracking-wider mb-2">05 / HOW TO</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 pb-4 border-b-2 border-gray-100">어떻게 영업하나요?</h2>
+                    
+                    <div class="grid md:grid-cols-2 gap-8 flex-1">
+                        <!-- 온라인 -->
+                        <div class="bg-white border-2 border-blue-50 rounded-2xl p-8 hover:border-blue-200 transition flex flex-col h-full">
+                            <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                                <i data-lucide="laptop" class="w-7 h-7 text-blue-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4">온라인 활동 (Inbound)</h3>
+                            <p class="text-gray-600 mb-6">스마트폰과 PC만 있다면 시공간의 제약 없이 고객을 만날 수 있습니다.</p>
+                            <ul class="space-y-3 mb-6 flex-1">
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0"></div> <span>네이버 블로그, 카페 홍보 게시글</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0"></div> <span>인스타그램, 당근마켓 등 SNS 활용</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0"></div> <span>개인 홍보용 홈페이지/랜딩페이지 운영</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0"></div> <span>키워드 광고 등 유료 마케팅 (선택)</span>
+                                </li>
+                            </ul>
+                            <!-- 추가된 온라인 혜택 안내 -->
+                            <div class="bg-blue-50 text-blue-800 p-4 rounded-xl text-sm font-semibold flex items-start gap-3 border border-blue-100 mt-auto shadow-sm">
+                                <i data-lucide="book-open" class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"></i>
+                                <p class="leading-relaxed">※ 계약 완료 시, 블로그 글쓰기 및 키워드 광고 등 <strong>실전 온라인 영업 노하우가 담긴 전용 전자책</strong>을 추가로 제공해 드립니다!</p>
+                            </div>
+                        </div>
+
+                        <!-- 오프라인 -->
+                        <div class="bg-white border-2 border-green-50 rounded-2xl p-8 hover:border-green-200 transition flex flex-col h-full">
+                            <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6">
+                                <i data-lucide="users" class="w-7 h-7 text-green-600"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-4">오프라인 활동 (Outbound)</h3>
+                            <p class="text-gray-600 mb-6">네트워크를 활용하거나 발로 뛰며 확실한 타겟에게 접근합니다.</p>
+                            <ul class="space-y-3 flex-1">
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-green-500 mt-2 shrink-0"></div> <span>지인, 가족 등 초기 인맥 활용 (본인/가족 렌탈 포함)</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-green-500 mt-2 shrink-0"></div> <span>기존 고객의 추가 렌탈 가입 유도 (입소문 전략)</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-green-500 mt-2 shrink-0"></div> <span>부동산, 이삿짐 센터, 인테리어 업체 등 이종업계 제휴</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-green-500 mt-2 shrink-0"></div> <span>식당, 사무실, 학원 등 오픈 매장 대상 B2B 개척</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-green-500 mt-2 shrink-0"></div> <span>신축 아파트 입주장, 상가 분양 현장 등 거점 영업</span>
+                                </li>
+                                <li class="flex items-start gap-3 text-gray-700">
+                                    <div class="w-2 h-2 rounded-full bg-green-500 mt-2 shrink-0"></div> <span>전단지, 명함, 판촉물 배포를 통한 지역 기반 홍보</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 7: 파트너 지원 -->
+            <section class="slide">
+                <div class="content-card flex flex-col p-8 md:p-16">
+                    <span class="text-blue-600 font-bold tracking-wider mb-2">06 / SUPPORT</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 pb-4 border-b-2 border-gray-100">든든한 파트너 지원 시스템</h2>
+                    
+                    <p class="text-gray-600 mb-8 text-lg">초보자도 당장 내일부터 시작할 수 있도록 본사에서 모든 것을 지원합니다.</p>
+
+                    <div class="grid grid-cols-2 gap-4 md:gap-6">
+                        <div class="bg-gray-50 p-6 rounded-2xl">
+                            <i data-lucide="headset" class="w-8 h-8 text-blue-500 mb-4"></i>
+                            <h3 class="font-bold text-lg text-gray-900 mb-2">1:1 상담 및 승인 지원</h3>
+                            <p class="text-sm text-gray-600">까다로운 고객 응대는 거의 없습니다. 주로 신용 문제로 렌탈 진행을 고민하는 분들이 '개통 가능한 방법'을 문의하며, 본사에서 이를 위한 승인 솔루션을 적극 지원해 드립니다.</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-2xl">
+                            <i data-lucide="laptop" class="w-8 h-8 text-blue-500 mb-4"></i>
+                            <h3 class="font-bold text-lg text-gray-900 mb-2">자동화된 상품 업데이트</h3>
+                            <p class="text-sm text-gray-600">복잡하고 머리 아픈 상품 공부는 하실 필요가 없습니다. 홈페이지에 신상품, 단종 상품, 가격 변동 내역이 실시간으로 자동 업데이트되므로 편하게 내용만 확인하시면 됩니다.</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-2xl">
+                            <i data-lucide="file-check-2" class="w-8 h-8 text-blue-500 mb-4"></i>
+                            <h3 class="font-bold text-lg text-gray-900 mb-2">계약 처리 대행</h3>
+                            <p class="text-sm text-gray-600">복잡한 전산 입력, 신용 조회, 해피콜 등의 행정 업무는 본사 전산팀에서 처리합니다.</p>
+                        </div>
+                        <div class="bg-gray-50 p-6 rounded-2xl">
+                            <i data-lucide="wrench" class="w-8 h-8 text-blue-500 mb-4"></i>
+                            <h3 class="font-bold text-lg text-gray-900 mb-2">설치 및 A/S 관리</h3>
+                            <p class="text-sm text-gray-600">계약 이후 배송, 설치, 사후 A/S는 모두 해당 제조사(브랜드)에서 100% 전담합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 8: 시작 과정 -->
+            <section class="slide">
+                <div class="content-card flex flex-col p-8 md:p-16">
+                    <span class="text-blue-600 font-bold tracking-wider mb-2">07 / PROCESS</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-10 pb-4 border-b-2 border-gray-100">파트너 시작 절차</h2>
+                    
+                    <div class="flex flex-col space-y-8 relative before:absolute before:inset-0 before:ml-6 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-blue-300 before:to-transparent">
+                        
+                        <!-- Step 1 -->
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white bg-blue-500 text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-md z-10">1</div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
+                                <h3 class="font-bold text-lg text-gray-900">상담 신청 및 진행</h3>
+                                <p class="text-sm text-gray-600 mt-1">문의를 남겨주시면 담당자가 배정되어 유선 상담을 진행합니다.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 2 -->
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white bg-blue-500 text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-md z-10">2</div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
+                                <h3 class="font-bold text-lg text-gray-900">상세 사업 설명</h3>
+                                <p class="text-sm text-gray-600 mt-1">수수료 단가표, 구체적인 영업 방식 등 심도 있는 안내를 받습니다.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 3 -->
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white bg-blue-500 text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-md z-10">3</div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-white border border-gray-200 p-5 rounded-xl shadow-sm">
+                                <h3 class="font-bold text-lg text-gray-900">파트너 등록</h3>
+                                <p class="text-sm text-gray-600 mt-1">간단한 서류(신분증, 통장사본 등) 제출 후 파트너 코드가 발급됩니다.</p>
+                            </div>
+                        </div>
+
+                        <!-- Step 4 -->
+                        <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                            <div class="flex items-center justify-center w-12 h-12 rounded-full border-4 border-white bg-blue-600 text-white font-bold shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 shadow-md z-10">
+                                <i data-lucide="rocket" class="w-5 h-5"></i>
+                            </div>
+                            <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] bg-blue-50 border border-blue-200 p-5 rounded-xl shadow-sm">
+                                <h3 class="font-bold text-lg text-blue-900">교육 및 활동 시작</h3>
+                                <p class="text-sm text-gray-700 mt-1">기초 교육 자료를 수령하고, 당일부터 즉시 영업 활동 및 수익 창출이 가능합니다.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 9: 자주 묻는 질문 -->
+            <section class="slide">
+                <div class="content-card flex flex-col p-8 md:p-16">
+                    <span class="text-blue-600 font-bold tracking-wider mb-2">08 / FAQ</span>
+                    <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-8 pb-4 border-b-2 border-gray-100">자주 묻는 질문</h2>
+                    
+                    <div class="space-y-4 overflow-y-auto">
+                        <!-- Q1 -->
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-900 flex items-start gap-3">
+                                <span class="text-blue-600">Q.</span> 초기 비용이나 가입비가 있나요?
+                            </h3>
+                            <div class="mt-3 text-gray-600 flex items-start gap-3 pl-7 border-l-2 border-gray-200 ml-2">
+                                <span class="text-gray-400 font-bold">A.</span>
+                                <p>전산 시스템만 이용하실 경우 <strong>초기 비용 없이 전액 무료</strong>로 시작 가능합니다. 단, 개인 홍보용 홈페이지 세팅이 필요하신 경우에만 호스팅, 도메인, 보안서버 비용을 포함하여 <strong>연 30만 원(1년 단위 유지비)</strong>이 발생합니다. (홈페이지는 필수 아닌 선택 사항)</p>
+                            </div>
+                        </div>
+                        <!-- Q2 -->
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-900 flex items-start gap-3">
+                                <span class="text-blue-600">Q.</span> 영업 경험이 없는데 괜찮을까요?
+                            </h3>
+                            <div class="mt-3 text-gray-600 flex items-start gap-3 pl-7 border-l-2 border-gray-200 ml-2">
+                                <span class="text-gray-400 font-bold">A.</span>
+                                <p>네, 괜찮습니다. 고객을 유치해 주시면 어려운 상담과 전산 처리는 본사에서 든든하게 서포트해 드립니다. 주변 지인 영업은 물론이고 <strong>블로그, 인스타그램, 릴스/쇼츠, 당근마켓, 카카오톡 오픈채팅</strong> 등 본인에게 편한 다양한 SNS 채널을 활용한 온라인 홍보만으로도 충분히 활동이 가능합니다.</p>
+                            </div>
+                        </div>
+                        <!-- Q3 -->
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-900 flex items-start gap-3">
+                                <span class="text-blue-600">Q.</span> 직장인인데 투잡/부업으로 가능한가요?
+                            </h3>
+                            <div class="mt-3 text-gray-600 flex items-start gap-3 pl-7 border-l-2 border-gray-200 ml-2">
+                                <span class="text-gray-400 font-bold">A.</span>
+                                <p>가장 많이 활동하시는 형태가 직장인 부업입니다. 출퇴근 시간이나 주말을 활용해 온라인 포스팅을 하거나, 비대면 톡 상담으로 진행할 수 있어 시간에 얽매이지 않습니다.</p>
+                            </div>
+                        </div>
+                        <!-- Q4 -->
+                        <div class="bg-gray-50 rounded-xl p-5 border border-gray-100">
+                            <h3 class="font-bold text-lg text-gray-900 flex items-start gap-3">
+                                <span class="text-blue-600">Q.</span> 수익금 지급은 언제 이루어지나요?
+                            </h3>
+                            <div class="mt-3 text-gray-600 flex items-start gap-3 pl-7 border-l-2 border-gray-200 ml-2">
+                                <span class="text-gray-400 font-bold">A.</span>
+                                <div>
+                                    <p>고객 댁에 제품 <strong>설치가 완료된 건에 한하여, 익월 말일</strong>에 파트너님의 계좌로 투명하게 직접 입금됩니다.</p>
+                                    <p class="mt-2 text-sm text-gray-500 font-medium bg-gray-100 p-2 rounded-lg inline-block">※ 추가로 사업자가 없는 파트너님은 총 수수료에서 13.3%(부가세 및 원천징수세) 제외 후 입금됩니다.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Page 10: 마지막 페이지 -->
+            <section class="slide">
+                <div class="content-card flex flex-col justify-center items-center p-8 md:p-16 text-center bg-gray-900 text-white relative overflow-hidden">
+                    <!-- Background decoration -->
+                    <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
+                        <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-blue-500 rounded-full blur-3xl"></div>
+                        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-purple-500 rounded-full blur-3xl"></div>
+                    </div>
+
+                    <div class="relative z-10 flex flex-col items-center">
+                        <i data-lucide="lock" class="w-16 h-16 text-gray-400 mb-6"></i>
+                        <h2 class="text-3xl md:text-5xl font-bold mb-6">더 깊은 노하우는<br>계약 후 공개됩니다.</h2>
+                        
+                        <div class="w-20 h-1 bg-blue-500 my-8"></div>
+                        
+                        <p class="text-xl md:text-2xl text-gray-300 font-light leading-relaxed max-w-2xl mb-10">
+                            "실제 수익을 내는 구체적인 블로그 글쓰기 방법, 광고 노하우, 단가표 등이 담긴 <strong class="text-white font-bold border-b-2 border-blue-500">심화 전자책 및 자료</strong>는 파트너 계약 이후 추가로 안내해 드립니다."
+                        </p>
+
+                        <div class="bg-gray-800 border border-gray-700 rounded-lg py-4 px-8 mt-4">
+                            <p class="text-sm text-gray-400">담당자에게 돌아가 <span class="text-white font-bold">'자료 다 봤습니다'</span> 라고 남겨주시면,<br>다음 안내를 도와드리겠습니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Navigation UI -->
+        <button id="prevBtn" class="nav-btn absolute left-2 md:left-8 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center text-gray-800 z-50">
+            <i data-lucide="chevron-left" class="w-8 h-8"></i>
+        </button>
+        <button id="nextBtn" class="nav-btn absolute right-2 md:right-8 top-1/2 transform -translate-y-1/2 w-12 h-12 rounded-full flex items-center justify-center text-gray-800 z-50">
+            <i data-lucide="chevron-right" class="w-8 h-8"></i>
+        </button>
+
+        <!-- Pagination Dots -->
+        <div class="absolute bottom-4 left-0 w-full flex justify-center gap-2 z-50" id="pagination-dots">
+            <!-- Dots will be generated by JS -->
+        </div>
+
+    </div>
+
+    <!-- JavaScript for Slider Logic -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sliderContainer = document.getElementById('slider-container');
+            const slides = document.querySelectorAll('.slide');
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            const dotsContainer = document.getElementById('pagination-dots');
+            
+            const totalSlides = slides.length;
+            let currentSlide = 0;
+
+            // Generate dots
+            for(let i=0; i<totalSlides; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'progress-dot w-2 h-2 rounded-full bg-gray-300 cursor-pointer shadow-sm';
+                dot.addEventListener('click', () => goToSlide(i));
+                dotsContainer.appendChild(dot);
+            }
+            const dots = document.querySelectorAll('.progress-dot');
+
+            function updateSlider() {
+                // Move slider container
+                sliderContainer.style.transform = `translateX(-${currentSlide * 100}vw)`;
+                
+                // Update opacity for active class (for internal animations if needed)
+                slides.forEach((slide, index) => {
+                    if(index === currentSlide) {
+                        slide.classList.add('active');
+                    } else {
+                        slide.classList.remove('active');
+                    }
+                });
+
+                // Update buttons state
+                prevBtn.disabled = currentSlide === 0;
+                nextBtn.disabled = currentSlide === totalSlides - 1;
+
+                // Update dots
+                dots.forEach((dot, index) => {
+                    if(index === currentSlide) {
+                        dot.classList.add('active');
+                        dot.classList.replace('bg-gray-300', 'bg-blue-600');
+                    } else {
+                        dot.classList.remove('active');
+                        dot.classList.replace('bg-blue-600', 'bg-gray-300');
+                    }
+                });
+            }
+
+            function goToSlide(index) {
+                if(index >= 0 && index < totalSlides) {
+                    currentSlide = index;
+                    updateSlider();
+                }
+            }
+
+            // Click events
+            prevBtn.addEventListener('click', () => goToSlide(currentSlide - 1));
+            nextBtn.addEventListener('click', () => goToSlide(currentSlide + 1));
+
+            // Keyboard events
+            document.addEventListener('keydown', (e) => {
+                if(e.key === 'ArrowLeft') goToSlide(currentSlide - 1);
+                if(e.key === 'ArrowRight') goToSlide(currentSlide + 1);
+            });
+
+            // Touch events for mobile swipe
+            let startX = 0;
+            let currentX = 0;
+            
+            sliderContainer.addEventListener('touchstart', (e) => {
+                startX = e.touches[0].clientX;
+            }, {passive: true});
+
+            sliderContainer.addEventListener('touchend', (e) => {
+                currentX = e.changedTouches[0].clientX;
+                handleSwipe();
+            }, {passive: true});
+
+            function handleSwipe() {
+                const swipeThreshold = 50; // minimum distance for swipe
+                const diff = startX - currentX;
+
+                if(Math.abs(diff) > swipeThreshold) {
+                    if(diff > 0) {
+                        // Swiped left
+                        goToSlide(currentSlide + 1);
+                    } else {
+                        // Swiped right
+                        goToSlide(currentSlide - 1);
+                    }
+                }
+            }
+
+            // Initialize
+            updateSlider();
+        });
+    </script>
+</body>
+</html>
