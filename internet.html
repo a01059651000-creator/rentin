@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>렌트인 | 인터넷 가입 최대 48만원+@ 설치 당일 현금 지원</title>
+<title>인터넷도 역시 렌트인 | 최대 48만원+@ 설치 당일 현금 지급</title>
 <meta name="description" content="KT, SKT, LG U+, 헬로, 스카이라이프 인터넷·TV 가입 시 설치 당일 현금 지원. 최대 48만원+@">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
 <style>
@@ -31,15 +31,15 @@ body{font-family:'Noto Sans KR',sans-serif;background:#fff;color:#111;overflow-x
 /* 히어로 */
 .hero{background:var(--bg);padding:130px 20px 80px;text-align:center;position:relative;overflow:hidden;}
 .hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(26,110,255,0.35) 0%,transparent 70%);}
-.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:120px;background:linear-gradient(to bottom,transparent,#fff);}
 
-.hero-inner{position:relative;z-index:2;max-width:760px;margin:0 auto;}
+
+.hero-inner{position:relative;z-index:2;max-width:860px;margin:0 auto;padding:0 10px;}
 
 .hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(255,214,0,0.12);border:1.5px solid rgba(255,214,0,0.35);color:var(--yellow);font-size:13px;font-weight:800;padding:7px 18px;border-radius:50px;margin-bottom:28px;}
 .hero-tag i{width:8px;height:8px;background:var(--yellow);border-radius:50%;animation:blink 1.2s infinite;}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:0.2}}
 
-.hero h1{font-size:clamp(30px,6.5vw,68px);font-weight:900;color:#fff;line-height:1.18;letter-spacing:-1.5px;margin-bottom:20px;}
+.hero h1{font-size:clamp(24px,4vw,56px);font-weight:900;color:#fff;line-height:1.25;letter-spacing:-0.5px;margin-bottom:20px;}
 .hero h1 .y{color:var(--yellow);}
 .hero h1 .b{color:#5ba3ff;}
 
@@ -173,13 +173,32 @@ footer a{color:#555;text-decoration:none;}
 .fix-btn{position:fixed;bottom:20px;right:20px;z-index:998;background:linear-gradient(135deg,#ff3b30,#cc1500);color:#fff;font-weight:900;font-size:13px;padding:13px 22px;border-radius:50px;text-decoration:none;box-shadow:0 6px 24px rgba(255,59,48,0.45);display:flex;align-items:center;gap:6px;animation:bounce2 2s infinite;}
 @keyframes bounce2{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
 
-@media(max-width:600px){
+@media(max-width:768px){
   .topbar{font-size:11px;padding:8px 12px;}
   .hdr{top:30px;padding:12px 16px;}
-  .hero{padding:120px 16px 60px;}
-  .bene-cards{grid-template-columns:1fr 1fr;}
+  .hdr-logo{font-size:16px;}
+  .hdr-tel{font-size:14px;}
+  .hero{padding:110px 16px 60px;}
+  .hero h1{font-size:28px;letter-spacing:-0.5px;}
+  .hero-desc{font-size:14px;}
+  .btn-red{font-size:16px;padding:16px 36px;}
+  .numbers-grid{grid-template-columns:1fr 1fr;gap:10px;}
+  .num-val{font-size:28px;}
+  .bene-cards{grid-template-columns:1fr 1fr;gap:12px;}
+  .bene-card{padding:20px 16px;}
+  .bene-card .big-num{font-size:28px;}
+  .why-grid{grid-template-columns:1fr;}
+  .why-item{padding:20px 18px;}
+  .compare-table{overflow-x:auto;}
+  .compare-table table{min-width:480px;}
+  .live-box{padding:20px 16px;}
   .fbox{padding:24px 18px;}
-  .numbers-grid{grid-template-columns:1fr 1fr;}
+  .fg input{font-size:16px;}
+  .btn-submit{font-size:16px;padding:16px;}
+  .form-tel-wrap a{font-size:20px;}
+  .fix-btn{bottom:16px;right:16px;font-size:12px;padding:11px 18px;}
+  .sec-h{font-size:24px;}
+  .faq-q{font-size:14px;}
 }
 </style>
 </head>
@@ -190,7 +209,7 @@ footer a{color:#555;text-decoration:none;}
 
 <!-- 헤더 -->
 <header class="hdr">
-  <div class="hdr-logo">렌트인 <em>인터넷</em></div>
+  <div class="hdr-logo">인터넷도 역시 <em>렌트인</em></div>
   <a href="tel:16615534" class="hdr-tel">📞 1661-5534</a>
 </header>
 
@@ -275,18 +294,8 @@ footer a{color:#555;text-decoration:none;}
       <h3>통신사 동시 비교</h3>
       <p>KT·SKT·LG·헬로·스카이라이프 한 번에 비교해 최저가 확정</p>
     </div>
-    <div class="bene-card">
-      <div class="ico">🎁</div>
-      <div class="big-num">+<span>사은품</span></div>
-      <h3>추가 사은품 지급</h3>
-      <p>상담 신청 고객 한정, 비밀 사은품 추가 증정. 상담 시 공개!</p>
-    </div>
-    <div class="bene-card">
-      <div class="ico">🏆</div>
-      <div class="big-num">120<span>%</span></div>
-      <h3>최저 요금 보장제</h3>
-      <p>타사보다 비싸면 차액의 120% 보상. 그만큼 자신 있습니다</p>
-    </div>
+
+
   </div>
 </section>
 
@@ -318,13 +327,7 @@ footer a{color:#555;text-decoration:none;}
         <p>불리한 약정 없이 최적 조건으로 가입. 위약금 함정 없습니다.</p>
       </div>
     </div>
-    <div class="why-item">
-      <div class="why-ico">📞</div>
-      <div>
-        <h3>전담 상담사 직접 배정</h3>
-        <p>가입 후에도 동일 담당자가 요금제 변경, AS 연계까지 책임집니다.</p>
-      </div>
-    </div>
+
   </div>
 </section>
 
