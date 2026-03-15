@@ -106,12 +106,13 @@
                     id_card_url: idCardUrl,
                     bank_book_url: bankBookUrl,
                     biz_lic_url: bizLicUrl,
-                    signature_img: signatureImg
+                    signature_img: signatureImg,
+                    source: '정수기마켓'
                 });
 
                 btn.innerText = "⏳ 알림 전송 중...";
                 const typeText = window.partnerType === 'individual' ? '개인(프리랜서)' : '사업자';
-                await sendTelegram(`🚨 <b>새로운 파트너 계약 접수!</b>\n\n👤 <b>성함/상호:</b> ${name}\n📞 <b>연락처:</b> ${phone}\n🏷️ <b>유형:</b> ${typeText}\n📍 <b>주소:</b> ${address}\n\n📎 첨부서류:\n• 신분증: ${idCardUrl ? '✅' : '❌'}\n• 통장사본: ${bankBookUrl ? '✅' : '❌'}\n• 사업자등록증: ${bizLicUrl ? '✅' : '해당없음'}\n\n🔗 어드민에서 확인하세요!`);
+                await sendTelegram(`🚨 <b>새로운 파트너 계약 접수!</b>\n\n🌐 <b>출처: 정수기마켓</b>\n👤 <b>성함/상호:</b> ${name}\n📞 <b>연락처:</b> ${phone}\n🏷️ <b>유형:</b> ${typeText}\n📍 <b>주소:</b> ${address}\n\n📎 첨부서류:\n• 신분증: ${idCardUrl ? '✅' : '❌'}\n• 통장사본: ${bankBookUrl ? '✅' : '❌'}\n• 사업자등록증: ${bizLicUrl ? '✅' : '해당없음'}\n\n🔗 어드민에서 확인하세요!`);
 
                 const isImg = (url) => url && /\.(jpg|jpeg|png|webp)/i.test(url.split('?')[0]);
                 if (isImg(idCardUrl)) await sendTelegramPhoto(idCardUrl, `📛 ${name} - 신분증 사본`);
