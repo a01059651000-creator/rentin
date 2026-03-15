@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>전산 접수 매뉴얼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --primary: #e8004d; --primary-dim: rgba(232,0,77,0.1);
+  --teal: #00b2b2; --teal-dim: rgba(0,178,178,0.08);
+  --dark: #1a1d26; --card: #ffffff; --bg: #f4f6fb;
+  --border: #e8ecf4; --text: #1a1d26; --muted: #7a829a;
+}
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); }
+
+.header { background: var(--dark); position: sticky; top: 0; z-index: 100; }
+.header-inner { max-width: 860px; margin: 0 auto; padding: 0 20px; height: 56px; display: flex; align-items: center; justify-content: space-between; }
+.hbadge { background: var(--primary); color: white; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 5px; }
+.htitle { font-size: 15px; font-weight: 700; color: white; margin-left: 10px; }
+.hurl { font-size: 11px; color: rgba(255,255,255,.4); }
+
+.hero { background: linear-gradient(135deg, #1a1d26 0%, #2d1435 100%); padding: 36px 20px; text-align: center; }
+.hero h1 { font-size: 24px; font-weight: 900; color: white; line-height: 1.35; margin-bottom: 8px; }
+.hero h1 em { color: var(--primary); font-style: normal; }
+.hero p { font-size: 13px; color: rgba(255,255,255,.5); }
+
+.wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px 60px; }
+
+.top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.icard { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px; }
+.ictitle { font-size: 11px; font-weight: 700; color: var(--muted); letter-spacing: .8px; text-transform: uppercase; margin-bottom: 14px; }
+
+.arow { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.arow:last-of-type { margin-bottom: 0; }
+.aicon { font-size: 20px; }
+.alabel { font-size: 10px; color: var(--muted); }
+.aurl { font-size: 13px; font-weight: 700; color: var(--primary); }
+
+.rrow { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.rrow:last-of-type { border: none; }
+.rname { font-size: 12px; font-weight: 700; color: var(--text); min-width: 86px; }
+.tags { display: flex; gap: 4px; flex-wrap: wrap; }
+.tag { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 20px; }
+.tr { background: var(--primary-dim); color: var(--primary); border: 1px solid rgba(232,0,77,.2); }
+.te { background: var(--teal-dim); color: var(--teal); border: 1px solid rgba(0,178,178,.2); }
+
+.warnbox { background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.25); border-radius: 10px; padding: 11px 13px; margin-top: 12px; font-size: 12px; color: #92650a; line-height: 1.65; }
+.warnbox strong { color: #b45309; }
+
+.expand-btn { width: 100%; padding: 11px; margin-bottom: 18px; background: var(--card); border: 1px solid var(--border); border-radius: 12px; font-size: 13px; font-weight: 600; color: var(--muted); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all .2s; font-family: inherit; }
+.expand-btn:hover { border-color: var(--primary); color: var(--primary); }
+
+.scard { background: var(--card); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 14px; transition: box-shadow .2s; }
+.scard:hover { box-shadow: 0 6px 20px rgba(0,0,0,.07); }
+.shead { display: flex; align-items: center; gap: 14px; padding: 16px 20px; cursor: pointer; user-select: none; }
+.snum { width: 34px; height: 34px; border-radius: 9px; background: var(--primary); color: white; font-size: 14px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.snum.tip { background: var(--teal); font-size: 16px; }
+.snum.fee { background: #7c3aed; }
+.stitle { font-size: 14px; font-weight: 700; color: var(--text); }
+.ssub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.sarrow { margin-left: auto; color: var(--muted); font-size: 12px; transition: transform .25s; }
+.scard.open .sarrow { transform: rotate(180deg); }
+.sbody { display: none; padding: 0 20px 20px; border-top: 1px solid var(--border); }
+.scard.open .sbody { display: block; }
+
+.imgwrap { margin: 16px 0; border-radius: 10px; overflow: hidden; border: 1px solid var(--border); background: #f8f9fc; cursor: zoom-in; }
+.imgwrap img { width: 100%; display: block; height: 220px; object-fit: contain; background: #f8f9fc; }
+
+.desc { font-size: 13px; color: #475569; line-height: 1.8; margin-bottom: 10px; }
+.desc strong { color: var(--text); font-weight: 700; }
+.desc em { color: var(--primary); font-style: normal; font-weight: 600; }
+
+.pbox { background: var(--primary-dim); border: 1px solid rgba(232,0,77,.15); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #be123c; line-height: 1.8; margin-top: 10px; }
+.pbox strong { color: var(--primary); }
+.tbox { background: var(--teal-dim); border: 1px solid rgba(0,178,178,.2); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #0e7490; line-height: 1.8; margin-top: 10px; }
+.tbox strong { color: #0891b2; }
+
+.sgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
+.si { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 11px 12px; }
+.sb { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 20px; margin-bottom: 4px; }
+.s1 { background: #dbeafe; color: #1d4ed8; }
+.s2 { background: #dcfce7; color: #15803d; }
+.s3 { background: #fef9c3; color: #a16207; }
+.s4 { background: #fee2e2; color: #b91c1c; }
+.s5 { background: #d1fae5; color: #065f46; }
+.s6 { background: #f3f4f6; color: #6b7280; }
+.sdesc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.88); backdrop-filter: blur(4px); z-index: 9999; display: none; align-items: center; justify-content: center; padding: 16px; }
+.lightbox.open { display: flex; }
+.lightbox img { max-width: 100%; max-height: 92vh; border-radius: 8px; }
+.lbclose { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,.15); border: none; color: white; font-size: 20px; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+@media (max-width: 600px) {
+  .top-grid { grid-template-columns: 1fr; }
+  .sgrid { grid-template-columns: 1fr; }
+  .hero h1 { font-size: 20px; }
+  .imgwrap img { height: 160px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div style="display:flex;align-items:center;">
+      <span class="hbadge">내부용</span>
+      <span class="htitle">전산 접수 매뉴얼</span>
+    </div>
+    <span class="hurl">rentdata.co.kr</span>
+  </div>
+</div>
+
+<div class="hero">
+  <h1>파트너 전산 접수<br><em>단계별 가이드</em></h1>
+  <p>처음 접수하시는 분도 순서대로 따라하시면 됩니다</p>
+</div>
+
+<div class="wrap">
+
+  <div class="top-grid">
+    <!-- 접속 주소 -->
+    <div class="icard">
+      <div class="ictitle">접속 주소</div>
+      <div class="arow">
+        <div class="aicon">🖥️</div>
+        <div><div class="alabel">PC</div><div class="aurl">rentdata.co.kr</div></div>
+      </div>
+      <div class="arow">
+        <div class="aicon">📱</div>
+        <div><div class="alabel">모바일</div><div class="aurl">rentdata.co.kr/smart</div></div>
+      </div>
+      <div class="warnbox" style="margin-top:14px;">
+        💻 <strong>수수료 조회는 PC 전용</strong>입니다.<br>모바일에서는 수수료 카테고리가 보이지 않습니다.
+      </div>
+    </div>
+
+    <!-- 렌탈사별 정보 -->
+    <div class="icard">
+      <div class="ictitle">렌탈사별 필수 입력 정보</div>
+      <div class="rrow"><div class="rname">이니렌탈</div><div class="tags"><span class="tag tr">성함</span><span class="tag tr">전화번호</span><span class="tag tr">주소</span></div></div>
+      <div class="rrow"><div class="rname">헬로렌탈</div><div class="tags"><span class="tag tr">성함</span><span class="tag tr">전화번호</span><span class="tag tr">주소</span></div></div>
+      <div class="rrow"><div class="rname">스마트렌탈</div><div class="tags"><span class="tag tr">성함</span><span class="tag tr">전화번호</span><span class="tag tr">주소</span></div></div>
+      <div class="rrow"><div class="rname">유버스</div><div class="tags"><span class="tag tr">성함</span><span class="tag tr">전화번호</span><span class="tag tr">주소</span><span class="tag te">생년월일</span></div></div>
+      <div class="rrow"><div class="rname">보람상조피플</div><div class="tags"><span class="tag tr">성함</span><span class="tag tr">전화번호</span><span class="tag tr">주소</span><span class="tag te">생년월일</span></div></div>
+      <div class="rrow"><div class="rname">소노아임레디</div><div class="tags"><span class="tag tr">성함</span><span class="tag tr">전화번호</span><span class="tag tr">주소</span><span class="tag te">생년월일</span></div></div>
+      <div class="warnbox">⚠️ <strong>유버스 / 보람상조피플 / 소노아임레디</strong>는 생년월일 필수<br>없이 접수 시 <strong>고객 연령 반드시 재확인</strong></div>
+    </div>
+  </div>
+
+  <button class="expand-btn" onclick="toggleAll()">
+    <span id="ei">▲</span><span id="et">전체 단계 접기</span>
+  </button>
+
+  <!-- STEP 1 -->
+  <div class="scard open" id="s1">
+    <div class="shead" onclick="tog('s1')">
+      <div class="snum">1</div>
+      <div><div class="stitle">영업상담등록 클릭</div><div class="ssub">전산 접속 후 좌측 메뉴에서 선택</div></div>
+      <div class="sarrow">▼</div>
+    </div>
+    <div class="sbody">
+      <div class="imgwrap" onclick="lb('https://a01059651000-creator.github.io/rentin/전산0.png')"><img src="https://a01059651000-creator.github.io/rentin/전산0.png" alt="영업상담등록"></div>
+      <p class="desc">전산 접속 후 좌측 메뉴에서 <strong>영업상담등록</strong>을 클릭합니다.<br>좌측에 <strong>수수료</strong>, <strong>비밀번호변경</strong> 메뉴도 확인할 수 있습니다.</p>
+    </div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="scard open" id="s2">
+    <div class="shead" onclick="tog('s2')">
+      <div class="snum">2</div>
+      <div><div class="stitle">우측 상단 [입력] 버튼 클릭</div><div class="ssub">노란색 입력 버튼으로 새 접수 시작</div></div>
+      <div class="sarrow">▼</div>
+    </div>
+    <div class="sbody">
+      <div class="imgwrap" onclick="lb('https://a01059651000-creator.github.io/rentin/전산1.png')"><img src="https://a01059651000-creator.github.io/rentin/전산1.png" alt="입력 버튼"></div>
+      <p class="desc">영업상담등록 화면에서 우측 상단의 <em>노란색 [입력] 버튼</em>을 클릭하세요.<br>고객 정보 입력 팝업이 열립니다.</p>
+    </div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="scard open" id="s3">
+    <div class="shead" onclick="tog('s3')">
+      <div class="snum">3</div>
+      <div><div class="stitle">고객 정보 입력</div><div class="ssub">성함, 전화번호, 주소 입력 후 메모 작성</div></div>
+      <div class="sarrow">▼</div>
+    </div>
+    <div class="sbody">
+      <div class="imgwrap" onclick="lb('https://a01059651000-creator.github.io/rentin/전산2.png')"><img src="https://a01059651000-creator.github.io/rentin/전산2.png" alt="고객 정보 입력"></div>
+      <p class="desc"><strong>주문자 정보</strong>에 고객 성함, 휴대폰 번호, 주소를 입력합니다.<br>각 렌탈사에 맞는 정보만 입력하시면 됩니다.</p>
+      <div class="pbox">💬 <strong>고객메모</strong>: 고객 특이사항 기재<br>💬 <strong>설치메모</strong>: 해피콜 가능 시간 등 추가 기재사항 작성</div>
+    </div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="scard open" id="s4">
+    <div class="shead" onclick="tog('s4')">
+      <div class="snum">4</div>
+      <div><div class="stitle">렌탈사 선택 및 모델 검색</div><div class="ssub">[찾기] 클릭 → 모델 검색 → 더블클릭 선택</div></div>
+      <div class="sarrow">▼</div>
+    </div>
+    <div class="sbody">
+      <div class="imgwrap" onclick="lb('https://a01059651000-creator.github.io/rentin/전산3.png')"><img src="https://a01059651000-creator.github.io/rentin/전산3.png" alt="모델 검색"></div>
+      <p class="desc">설치제품 옆 <strong>[찾기]</strong> 클릭 → 브랜드(렌탈사) 선택 후 모델명 입력 → 조회<br>원하는 제품의 <strong>개월수 및 렌탈료 확인 후 더블클릭</strong>하면 자동 입력됩니다.</p>
+    </div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="scard open" id="s5">
+    <div class="shead" onclick="tog('s5')">
+      <div class="snum">5</div>
+      <div><div class="stitle">내용 확인 후 [저장]</div><div class="ssub">최종 정보 확인 후 저장 버튼 클릭</div></div>
+      <div class="sarrow">▼</div>
+    </div>
+    <div class="sbody">
+      <div class="imgwrap" onclick="lb('https://a01059651000-creator.github.io/rentin/전산5저장.png')"><img src="https://a01059651000-creator.github.io/rentin/전산5저장.png" alt="저장"></div>
+      <p class="desc">입력한 고객 정보와 제품 정보를 <strong>최종 확인</strong>하세요.<br>이상 없으면 우측 하단 <em>[저장] 버튼</em>을 클릭해 접수를 완료합니다.</p>
+      <div class="tbox">✅ 저장 완료 후 본사에서 고객에게 해피콜을 진행합니다.</div>
+    </div>
+  </div>
+
+  <!-- STEP 6 기타 모델 -->
+  <div class="scard open" id="s6">
+    <div class="shead" onclick="tog('s6')">
+      <div class="snum tip">!</div>
+      <div><div class="stitle">모델을 찾을 수 없을 때</div><div class="ssub">브랜드 '기타' 선택 → 설치메모에 직접 입력</div></div>
+      <div class="sarrow">▼</div>
+    </div>
+    <div class="sbody">
+      <div class="imgwrap" onclick="lb('https://a01059651000-creator.github.io/rentin/전산4.png')"><img src="https://a01059651000-creator.github.io/rentin/전산4.png" alt="기타 모델"></div>
+      <p class="desc"><strong>브랜드를 '기타'로 선택</strong> → <strong>[기타메모확인]</strong> 클릭<br>설치메모란에 아래 형식으로 입력해 주세요.</p>
+      <div class="pbox">📝 <strong>설치메모 입력 형식</strong><br><strong>렌탈사 / 모델명 / 개월수 / 렌탈료</strong><br>예) 스마트렌탈 / WRV07GWVWL / 60개월 / 29,900원</div>
+    </div>
+  </div>
+
+  <!-- STEP 7 진행 상태 -->
+  <div class="scard open" id="s7">
+    <div class="shead" onclick="tog('s7')">
+      <div class="snum">7</div>
+      <div><div class="stitle">접수 후 진행 상태 확인</div><div class="ssub">[조회] 버튼으로 실시간 확인</div></div>
+      <div class="sarrow">▼</div>
+    </div>
+    <div class="sbody">
+      <p class="desc" style="margin-top:8px;">영업상담등록 화면에서 <strong>[조회]</strong> 버튼을 누르면 진행 상태를 확인할 수 있습니다.</p>
+      <div class="sgrid">
+        <div class="si"><span class="sb s1">진행중</span><div class="sdesc">해피콜 진행 전 상태</div></div>
+        <div class="si"><span class="sb s2">승인완료</span><div class="sdesc">고객 렌탈사 심사 승인</div></div>
+        <div class="si"><span class="sb s3">부재</span><div class="sdesc">고객 연락 안 됨</div></div>
+        <div class="si"><span class="sb s4">취소</span><div class="sdesc">심사 부결 또는 고객 취소</div></div>
+        <div class="si"><span class="sb s5">설치완료</span><div class="sdesc">설치 완료 (날짜 확인 가능)</div></div>
+        <div class="si"><span class="sb s6">설치예정일</span><div class="sdesc">무시하셔도 됩니다</div></div>
+      </div>
+      <div class="warnbox" style="margin-top:12px;">
+        ⚠️ <strong>F등급 (헬로렌탈 전용)</strong><br>
+        신용점수는 문제없으나 <strong>알고리즘에 의한 부결</strong>입니다.<br>
+        과도한 신용조회, 단기간 다수 개설 등이 원인일 수 있습니다.<br>
+        신용 문제가 아니므로 <strong>다른 렌탈사로 재접수</strong>를 시도해보세요.
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 8 수수료 -->
+  <div class="scard open" id="s8">
+    <div class="shead" onclick="tog('s8')">
+      <div class="snum fee">₩</div>
+      <div><div class="stitle">수수료 확인</div><div class="ssub">PC 전용 · 설치완료일 기준 익월 말일 정산</div></div>
+      <div class="sarrow">▼</div>
+    </div>
+    <div class="sbody">
+      <div class="imgwrap" onclick="lb('https://a01059651000-creator.github.io/rentin/전산수수료.png')"><img src="https://a01059651000-creator.github.io/rentin/전산수수료.png" alt="수수료 확인"></div>
+      <p class="desc">좌측 메뉴 <strong>수수료</strong> 클릭 → 기간 설정 후 <em>[조회]</em><br><strong>수수료(예정)</strong> 및 <strong>수수료(확정)</strong> 내역을 확인할 수 있습니다.</p>
+      <div class="tbox">
+        💰 <strong>정산 기준:</strong> 설치완료일 기준 <strong>익월 말일</strong> 파트너 계좌 입금<br>
+        📌 <strong>수수료 조회는 PC에서만 가능</strong> (모바일 조회 불가)<br>
+        📊 수수료(예정) = 설치 전 예상 / 수수료(확정) = 설치 후 확정 금액
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 라이트박스 -->
+<div class="lightbox" id="lightbox" onclick="closeLb()">
+  <button class="lbclose" onclick="closeLb()">✕</button>
+  <img id="lbimg" src="" alt="">
+</div>
+
+<script>
+function tog(id) { document.getElementById(id).classList.toggle('open'); }
+
+let allOpen = true;
+function toggleAll() {
+  allOpen = !allOpen;
+  document.querySelectorAll('.scard').forEach(c => allOpen ? c.classList.add('open') : c.classList.remove('open'));
+  document.getElementById('ei').textContent = allOpen ? '▲' : '▼';
+  document.getElementById('et').textContent = allOpen ? '전체 단계 접기' : '전체 단계 펼치기';
+}
+
+function lb(src) {
+  document.getElementById('lbimg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLb() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if(e.key==='Escape') closeLb(); });
+</script>
+</body>
+</html>
