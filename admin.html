@@ -3,191 +3,684 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>정수기마켓 - 보안 관리자 시스템</title>
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // 파이어베이스 설정
-        const firebaseConfig = {
-            apiKey: "AIzaSyD3A4xrFozCh10clw6hzhrgD7rRvXGojIU",
-            authDomain: "rentinp-172dd.firebaseapp.com",
-            projectId: "rentinp-172dd",
-            storageBucket: "rentinp-172dd.firebasestorage.app",
-            messagingSenderId: "176082975122",
-            appId: "1:176082975122:web:b792b8ad175dfa6bb7e94b"
-        };
-
-        // 접속 비밀번호 설정 (원하시는 대로 수정하세요)
-        const ADMIN_PASSWORD = "rlagytkd11@"; 
-
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        const appId = "rentinp-172dd";
-
-        async function initSystem() {
-            const pw = prompt("관리자 인증이 필요합니다. 비밀번호를 입력하세요.");
-            if (pw !== ADMIN_PASSWORD) {
-                alert("인증에 실패했습니다. 접근 권한이 없습니다.");
-                document.body.innerHTML = "<div style='text-align:center; padding-top:100px;'>🔒 승인되지 않은 접근입니다.</div>";
-                return;
-            }
-            
-            // 비밀번호가 맞을 때만 시스템 가동
-            document.getElementById('secure-overlay').style.display = 'none';
-            await loadContracts();
-        }
-
-        async function loadContracts() {
-            const listEl = document.getElementById('contract-list');
-            listEl.innerHTML = "<tr><td colspan='5' style='text-align:center;'>보안 채널 연결 중...</td></tr>";
-
-            try {
-                await signInAnonymously(auth);
-                const q = query(collection(db, 'artifacts', appId, 'public', 'data', 'contracts'));
-                const querySnapshot = await getDocs(q);
-                
-                listEl.innerHTML = "";
-                const docs = [];
-                querySnapshot.forEach(doc => docs.push({id: doc.id, ...doc.data()}));
-                docs.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
-
-                docs.forEach(data => {
-                    const date = data.createdAt ? new Date(data.createdAt.seconds * 1000).toLocaleDateString() : "-";
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${date}</td>
-                        <td><strong>${data.partnerName}</strong></td>
-                        <td>${data.partnerPhone}</td>
-                        <td>${data.partnerType === 'individual' ? '개인' : '사업자'}</td>
-                        <td>
-                            <button class="btn-view" onclick='viewContract(${JSON.stringify(data).replace(/'/g, "&apos;")})'>전체 데이터 조회</button>
-                        </td>
-                    `;
-                    listEl.appendChild(tr);
-                });
-            } catch (e) {
-                listEl.innerHTML = "<tr><td colspan='5' style='color:red;'>보안 오류: 데이터 로드 실패</td></tr>";
-            }
-        }
-
-        window.viewContract = function(data) {
-            const modal = document.getElementById('modal');
-            document.getElementById('m-name').innerText = data.partnerName;
-            document.getElementById('m-name-2').innerText = data.partnerName;
-            document.getElementById('m-phone').innerText = data.partnerPhone;
-            document.getElementById('m-addr').innerText = data.address || "-";
-            document.getElementById('m-type-info').innerText = data.partnerType === 'individual' ? `주민번호: ${data.residentNum || '-'}` : `사업자번호: ${data.bizNum || '-'}`;
-            document.getElementById('m-sig').src = data.signatureImg;
-            
-            const docsArea = document.getElementById('m-docs-area');
-            docsArea.innerHTML = `
-                <h3>[보안 저장소 데이터]</h3>
-                <div class="doc-item"><p>신분증</p><img src="${data.idCardUrl}" class="doc-img"></div>
-                <div class="doc-item"><p>통장사본</p><img src="${data.bankBookUrl}" class="doc-img"></div>
-                ${data.bizLicUrl ? `<div class="doc-item"><p>사업자등록증</p><img src="${data.bizLicUrl}" class="doc-img"></div>` : ''}
-            `;
-            
-            const dateObj = data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date();
-            document.getElementById('m-date').innerText = `${dateObj.getFullYear()}년 ${dateObj.getMonth()+1}월 ${dateObj.getDate()}일`;
-            modal.style.display = 'block';
-        };
-
-        window.closeModal = () => { document.getElementById('modal').style.display = 'none'; };
-        window.printModal = () => { window.print(); };
-
-        // 시작 시 비번 체크
-        window.onload = initSystem;
-
-    </script>
+    <title>정수기마켓 계약 어드민</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { font-family: 'Pretendard', sans-serif; background: #2c3e50; margin: 0; padding: 30px; color: #fff; }
-        .container { max-width: 1000px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; color: #333; }
-        h1 { font-size: 22px; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-        
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --bg: #0f1117;
+            --surface: #1a1d27;
+            --surface2: #22263a;
+            --border: #2e3248;
+            --accent: #4f8ef7;
+            --accent2: #7c5cfc;
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #f59e0b;
+            --text: #e8eaf6;
+            --text2: #8b92b8;
+            --text3: #555e8a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        /* ── 로그인 화면 ── */
+        #loginScreen {
+            display: flex; align-items: center; justify-content: center;
+            min-height: 100vh;
+            background: radial-gradient(ellipse at 30% 40%, rgba(79,142,247,0.12) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 60%, rgba(124,92,252,0.10) 0%, transparent 55%),
+                        var(--bg);
+        }
+        .login-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 48px 40px;
+            width: 380px;
+            text-align: center;
+            box-shadow: 0 24px 80px rgba(0,0,0,0.5);
+        }
+        .login-logo {
+            width: 56px; height: 56px; background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border-radius: 16px; display: flex; align-items: center; justify-content: center;
+            font-size: 26px; margin: 0 auto 20px;
+        }
+        .login-card h2 { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+        .login-card p { color: var(--text2); font-size: 13px; margin-bottom: 32px; }
+        .login-input {
+            width: 100%; padding: 14px 16px;
+            background: var(--bg); border: 1px solid var(--border);
+            border-radius: 10px; color: var(--text); font-size: 15px; font-family: inherit;
+            outline: none; letter-spacing: 4px; text-align: center;
+            transition: border-color 0.2s;
+            margin-bottom: 16px;
+        }
+        .login-input:focus { border-color: var(--accent); }
+        .login-btn {
+            width: 100%; padding: 14px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none; border-radius: 10px;
+            color: #fff; font-size: 15px; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .login-btn:hover { opacity: 0.88; }
+        .login-error { color: var(--red); font-size: 13px; margin-top: 12px; height: 18px; }
+
+        /* ── 메인 레이아웃 ── */
+        #adminApp { display: none; min-height: 100vh; }
+
+        /* 사이드바 */
+        .sidebar {
+            position: fixed; left: 0; top: 0; bottom: 0; width: 220px;
+            background: var(--surface); border-right: 1px solid var(--border);
+            display: flex; flex-direction: column; padding: 24px 0; z-index: 100;
+        }
+        .sidebar-logo {
+            padding: 0 20px 28px; border-bottom: 1px solid var(--border); margin-bottom: 20px;
+        }
+        .sidebar-logo .brand { font-size: 15px; font-weight: 700; color: var(--accent); }
+        .sidebar-logo .sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+        .nav-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 11px 20px; font-size: 13px; font-weight: 500; color: var(--text2);
+            cursor: pointer; transition: all 0.15s; border-left: 3px solid transparent;
+        }
+        .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+        .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(79,142,247,0.07); }
+        .nav-icon { font-size: 16px; width: 20px; text-align: center; }
+        .sidebar-bottom { margin-top: auto; padding: 20px; }
+        .logout-btn {
+            width: 100%; padding: 10px; background: transparent;
+            border: 1px solid var(--border); border-radius: 8px;
+            color: var(--text2); font-size: 12px; font-family: inherit; cursor: pointer; transition: 0.2s;
+        }
+        .logout-btn:hover { border-color: var(--red); color: var(--red); }
+
+        /* 메인 콘텐츠 */
+        .main { margin-left: 220px; padding: 32px; }
+        .page-header { margin-bottom: 28px; }
+        .page-header h1 { font-size: 24px; font-weight: 700; }
+        .page-header p { color: var(--text2); font-size: 13px; margin-top: 4px; }
+
+        /* 통계 카드 */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 28px; }
+        .stat-card {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 14px; padding: 20px;
+        }
+        .stat-label { font-size: 12px; color: var(--text2); margin-bottom: 10px; }
+        .stat-val { font-size: 28px; font-weight: 700; }
+        .stat-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+        .stat-card.blue .stat-val { color: var(--accent); }
+        .stat-card.green .stat-val { color: var(--green); }
+        .stat-card.purple .stat-val { color: var(--accent2); }
+        .stat-card.yellow .stat-val { color: var(--yellow); }
+
+        /* 검색/필터 바 */
+        .toolbar {
+            display: flex; gap: 12px; margin-bottom: 20px; align-items: center; flex-wrap: wrap;
+        }
+        .search-box {
+            flex: 1; min-width: 200px; padding: 10px 14px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text); font-size: 13px; font-family: inherit; outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-box:focus { border-color: var(--accent); }
+        .filter-btn {
+            padding: 10px 16px; background: var(--surface); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text2); font-size: 12px; font-family: inherit;
+            cursor: pointer; transition: all 0.15s; font-weight: 500;
+        }
+        .filter-btn:hover, .filter-btn.active { border-color: var(--accent); color: var(--accent); background: rgba(79,142,247,0.08); }
+        .refresh-btn {
+            padding: 10px 16px; background: linear-gradient(135deg, var(--accent), var(--accent2));
+            border: none; border-radius: 8px; color: #fff; font-size: 12px; font-family: inherit;
+            cursor: pointer; font-weight: 600; transition: opacity 0.2s;
+        }
+        .refresh-btn:hover { opacity: 0.85; }
+
+        /* 계약 목록 테이블 */
+        .table-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+        .table-header { padding: 16px 20px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 600; color: var(--text2); }
         table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #eee; font-size: 14px; }
-        th { background: #f8f9fa; color: #7f8c8d; }
-        
-        .btn-view { background: #34495e; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; }
-        .btn-refresh { background: #3498db; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        thead th {
+            padding: 12px 16px; text-align: left; font-size: 11px; font-weight: 600;
+            color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px;
+            background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--border);
+        }
+        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.15s; cursor: pointer; }
+        tbody tr:hover { background: rgba(79,142,247,0.05); }
+        tbody tr:last-child { border-bottom: none; }
+        tbody td { padding: 14px 16px; font-size: 13px; }
+        .badge {
+            display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600;
+        }
+        .badge-indi { background: rgba(79,142,247,0.15); color: var(--accent); }
+        .badge-biz { background: rgba(124,92,252,0.15); color: var(--accent2); }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
+        .empty-state .ico { font-size: 40px; margin-bottom: 12px; }
+        .loading-row td { text-align: center; padding: 40px; color: var(--text2); }
 
-        #secure-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #2c3e50; z-index: 9999; display: flex; align-items: center; justify-content: center; font-size: 20px; }
+        /* ── 모달 (상세보기) ── */
+        .modal-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+            z-index: 200; align-items: flex-start; justify-content: center;
+            padding: 24px; overflow-y: auto;
+        }
+        .modal-overlay.open { display: flex; }
+        .modal {
+            background: var(--surface); border: 1px solid var(--border);
+            border-radius: 20px; width: 100%; max-width: 880px;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.6);
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 24px; border-bottom: 1px solid var(--border);
+        }
+        .modal-title { font-size: 17px; font-weight: 700; }
+        .modal-close {
+            width: 32px; height: 32px; background: rgba(255,255,255,0.06);
+            border: none; border-radius: 8px; color: var(--text2); font-size: 18px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .modal-body { padding: 24px; }
 
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; overflow-y: auto; padding: 20px 0; }
-        .modal-content { background: #fff; margin: 0 auto; padding: 50px; width: 210mm; position: relative; color: #333; }
-        .modal-actions { position: fixed; top: 20px; right: 40px; display: flex; gap: 10px; z-index: 1001; }
-        .btn-print { background: #e74c3c; color: white; border: none; padding: 15px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; }
-        .btn-close { background: #333; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; }
+        /* 탭 */
+        .tabs { display: flex; gap: 4px; margin-bottom: 24px; background: var(--bg); border-radius: 10px; padding: 4px; }
+        .tab-btn {
+            flex: 1; padding: 9px; background: transparent; border: none;
+            border-radius: 7px; color: var(--text2); font-size: 13px; font-weight: 500;
+            font-family: inherit; cursor: pointer; transition: all 0.15s;
+        }
+        .tab-btn.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
 
-        .contract-view h1 { text-align: center; border: none; font-size: 28px; color: #000; }
-        .c-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        .c-table th, .c-table td { border: 1px solid #333; padding: 12px; font-size: 14px; }
-        .sig-img { width: 140px; height: 60px; vertical-align: middle; }
-        .hq-stamp { width: 60px; vertical-align: middle; }
+        /* 계약서 미리보기 */
+        .contract-preview {
+            background: #fff; color: #333;
+            border-radius: 10px; padding: 30px;
+            font-family: 'Noto Sans KR', sans-serif;
+            font-size: 13px; line-height: 1.8;
+        }
+        .contract-preview h1 { text-align: center; font-size: 22px; border-bottom: 2px solid #222; padding-bottom: 12px; margin-bottom: 20px; color: #111; }
+        .contract-preview h2 { font-size: 14px; border-left: 4px solid #2c3e50; padding-left: 8px; color: #2c3e50; margin: 20px 0 10px; }
+        .preview-table { width: 100%; border-collapse: collapse; margin-bottom: 16px; }
+        .preview-table th, .preview-table td { border: 1px solid #ddd; padding: 9px 12px; font-size: 13px; }
+        .preview-table th { background: #f8f9fa; width: 30%; font-weight: 600; text-align: left; }
+        .sig-img { max-height: 50px; }
+        .stamp-wrap { display: flex; align-items: center; gap: 6px; }
+        .stamp-wrap img { width: 48px; height: 48px; }
 
-        .docs-section { margin-top: 50px; border-top: 2px dashed #ccc; padding-top: 40px; }
-        .doc-item { margin-bottom: 30px; page-break-inside: avoid; }
-        .doc-img { max-width: 100%; border: 1px solid #ddd; }
+        /* 첨부파일 그리드 */
+        .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+        .file-card {
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s;
+        }
+        .file-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .file-thumb {
+            width: 100%; height: 160px; object-fit: cover; display: block; background: var(--bg);
+        }
+        .file-thumb-placeholder {
+            width: 100%; height: 160px; display: flex; align-items: center; justify-content: center;
+            background: var(--bg); font-size: 40px;
+        }
+        .file-label { padding: 12px; font-size: 12px; color: var(--text2); font-weight: 500; }
+        .file-open-btn {
+            display: block; margin: 0 12px 12px; padding: 8px;
+            background: rgba(79,142,247,0.12); border: 1px solid rgba(79,142,247,0.25);
+            border-radius: 6px; color: var(--accent); font-size: 12px; font-weight: 600;
+            text-align: center; text-decoration: none; transition: background 0.15s;
+        }
+        .file-open-btn:hover { background: rgba(79,142,247,0.22); }
+        .no-file { padding: 20px; text-align: center; color: var(--text3); font-size: 12px; }
 
-        @media print {
-            .container, .modal-actions, .no-print { display: none !important; }
-            #modal { position: absolute; top: 0; background: white; padding: 0; }
-            .modal-content { margin: 0; padding: 15mm; border: none; box-shadow: none; width: 100%; }
+        /* PDF 다운로드 버튼 */
+        .modal-footer {
+            padding: 16px 24px; border-top: 1px solid var(--border);
+            display: flex; gap: 10px; justify-content: flex-end;
+        }
+        .btn-pdf {
+            padding: 10px 20px; background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: none; border-radius: 8px; color: #fff;
+            font-size: 13px; font-weight: 700; font-family: inherit; cursor: pointer; transition: opacity 0.2s;
+        }
+        .btn-pdf:hover { opacity: 0.85; }
+        .btn-close2 {
+            padding: 10px 20px; background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 8px; color: var(--text2); font-size: 13px; font-family: inherit; cursor: pointer;
+        }
+
+        /* 이미지 라이트박스 */
+        .lightbox {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92);
+            z-index: 300; align-items: center; justify-content: center;
+        }
+        .lightbox.open { display: flex; }
+        .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .lightbox-close {
+            position: fixed; top: 20px; right: 24px;
+            background: rgba(255,255,255,0.1); border: none; border-radius: 50%;
+            width: 40px; height: 40px; color: #fff; font-size: 20px; cursor: pointer;
+        }
+
+        /* 반응형 */
+        @media (max-width: 900px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 16px; }
         }
     </style>
 </head>
 <body>
 
-<div id="secure-overlay">🔒 보안 인증 대기 중...</div>
-
-<div class="container">
-    <h1>
-        🛡️ 파트너 계약 보안 관리자 모드
-        <button class="btn-refresh" onclick="location.reload()">새로고침</button>
-    </h1>
-
-    <table>
-        <thead>
-            <tr>
-                <th>접수일</th>
-                <th>성함/상호</th>
-                <th>연락처</th>
-                <th>유형</th>
-                <th>작업</th>
-            </tr>
-        </thead>
-        <tbody id="contract-list"></tbody>
-    </table>
+<!-- 로그인 화면 -->
+<div id="loginScreen">
+    <div class="login-card">
+        <div class="login-logo">🔒</div>
+        <h2>관리자 로그인</h2>
+        <p>정수기마켓 계약 어드민</p>
+        <input type="password" class="login-input" id="pwInput" placeholder="비밀번호 입력" onkeydown="if(event.key==='Enter')doLogin()">
+        <button class="login-btn" onclick="doLogin()">로그인</button>
+        <div class="login-error" id="loginError"></div>
+    </div>
 </div>
 
-<div id="modal">
-    <div class="modal-actions no-print">
-        <button class="btn-print" onclick="printModal()">🖨️ 계약서+서류 통합 PDF 저장</button>
-        <button class="btn-close" onclick="closeModal()">닫기</button>
-    </div>
-    
-    <div class="modal-content" id="modal-body">
-        <div class="contract-view">
-            <h1>파트너 업무 위탁 계약서</h1>
-            <table class="c-table">
-                <tr><th>성함 / 상호</th><td><span id="m-name"></span></td></tr>
-                <tr><th>연락처</th><td><span id="m-phone"></span></td></tr>
-                <tr><th>구분</th><td><span id="m-type-info"></span></td></tr>
-                <tr><th>주소</th><td><span id="m-addr"></span></td></tr>
-            </table>
-            <table class="c-table">
-                <tr><th>본사(을)</th><td>(주)정수기마켓 [574-86-03026] <img src="https://raw.githubusercontent.com/a01059651000-creator/rentin/main/%EC%A3%BC%EC%8B%9D%ED%9A%8C%EC%82%AC%20%EC%A0%95%EC%88%98%EA%B8%B0%EB%A7%88%EC%BC%93_%EB%8F%84%EC%9E%A5.png" class="hq-stamp"></td></tr>
-                <tr><th>파트너(갑)</th><td>성함: <span id="m-name-2"></span> (인) <img id="m-sig" class="sig-img"></td></tr>
-            </table>
-            <div id="m-date" style="text-align:center; font-weight:bold; margin-top:50px; font-size:18px;"></div>
+<!-- 어드민 앱 -->
+<div id="adminApp">
+    <nav class="sidebar">
+        <div class="sidebar-logo">
+            <div class="brand">💧 정수기마켓</div>
+            <div class="sub">파트너 계약 관리 시스템</div>
         </div>
-        <div class="docs-section" id="m-docs-area"></div>
+        <div class="nav-item active" onclick="showPage('contracts')">
+            <span class="nav-icon">📋</span> 계약 목록
+        </div>
+        <div class="nav-item" onclick="showPage('stats')">
+            <span class="nav-icon">📊</span> 통계
+        </div>
+        <div class="sidebar-bottom">
+            <button class="logout-btn" onclick="doLogout()">🚪 로그아웃</button>
+        </div>
+    </nav>
+
+    <main class="main">
+        <!-- 페이지: 계약 목록 -->
+        <div id="page-contracts">
+            <div class="page-header">
+                <h1>파트너 계약 목록</h1>
+                <p>Firebase에서 실시간으로 불러옵니다</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card blue">
+                    <div class="stat-label">전체 계약</div>
+                    <div class="stat-val" id="statTotal">-</div>
+                    <div class="stat-sub">누적</div>
+                </div>
+                <div class="stat-card green">
+                    <div class="stat-label">이번 달</div>
+                    <div class="stat-val" id="statMonth">-</div>
+                    <div class="stat-sub">신규 접수</div>
+                </div>
+                <div class="stat-card purple">
+                    <div class="stat-label">개인 파트너</div>
+                    <div class="stat-val" id="statIndi">-</div>
+                    <div class="stat-sub">프리랜서</div>
+                </div>
+                <div class="stat-card yellow">
+                    <div class="stat-label">사업자 파트너</div>
+                    <div class="stat-val" id="statBiz">-</div>
+                    <div class="stat-sub">개인/법인</div>
+                </div>
+            </div>
+
+            <div class="toolbar">
+                <input class="search-box" id="searchInput" placeholder="🔍  이름, 연락처, 주소 검색..." oninput="renderTable()">
+                <button class="filter-btn active" id="filterAll" onclick="setFilter('all')">전체</button>
+                <button class="filter-btn" id="filterIndi" onclick="setFilter('individual')">개인</button>
+                <button class="filter-btn" id="filterBiz" onclick="setFilter('business')">사업자</button>
+                <button class="refresh-btn" onclick="loadContracts()">🔄 새로고침</button>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>성함/상호</th>
+                            <th>연락처</th>
+                            <th>유형</th>
+                            <th>주소</th>
+                            <th>접수일</th>
+                            <th>서류</th>
+                        </tr>
+                    </thead>
+                    <tbody id="contractTable">
+                        <tr class="loading-row"><td colspan="7">⏳ 데이터 로딩 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 페이지: 통계 (간단) -->
+        <div id="page-stats" style="display:none">
+            <div class="page-header"><h1>통계</h1><p>계약 현황 요약</p></div>
+            <div id="statsContent" style="color:var(--text2);font-size:14px;">계약 목록을 먼저 불러와 주세요.</div>
+        </div>
+    </main>
+</div>
+
+<!-- 상세보기 모달 -->
+<div class="modal-overlay" id="detailModal" onclick="closeModal(event)">
+    <div class="modal">
+        <div class="modal-header">
+            <div class="modal-title" id="modalTitle">계약 상세</div>
+            <button class="modal-close" onclick="closeModalDirect()">×</button>
+        </div>
+        <div class="modal-body">
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('preview')">📄 계약서 미리보기</button>
+                <button class="tab-btn" onclick="switchTab('files')">📎 첨부 서류</button>
+            </div>
+            <div id="tabPreview"></div>
+            <div id="tabFiles" style="display:none"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-close2" onclick="closeModalDirect()">닫기</button>
+            <button class="btn-pdf" onclick="downloadPDF()">📥 PDF 저장</button>
+        </div>
     </div>
 </div>
 
+<!-- 이미지 라이트박스 -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close" onclick="closeLightbox()">×</button>
+    <img id="lightboxImg" src="" alt="">
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+import { getFirestore, collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyD3A4xrFozCh10clw6hzhrgD7rRvXGojIU",
+    authDomain: "rentinp-172dd.firebaseapp.com",
+    projectId: "rentinp-172dd",
+    storageBucket: "rentinp-172dd.firebasestorage.app",
+    messagingSenderId: "176082975122",
+    appId: "1:176082975122:web:b792b8ad175dfa6bb7e94b"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const appId = "rentinp-172dd";
+
+// ✅ Firestore 경로 수정: 최상위 'contracts' 컬렉션 사용
+// 계약서 코드와 동일하게 맞춰주세요. 현재 계약서 코드도 함께 수정 필요!
+// collection(db, 'contracts')  ← 권장 경로
+// 아래는 기존 계약서 코드의 경로와 동일하게 유지 (오류 있으나 현행 데이터 위치)
+const CONTRACTS_REF = collection(db, 'artifacts', appId, 'public', 'data', 'contracts');
+
+window._allContracts = [];
+window._filter = 'all';
+
+window.loadContracts = async function() {
+    try {
+        await signInAnonymously(auth);
+        const tbody = document.getElementById('contractTable');
+        tbody.innerHTML = '<tr class="loading-row"><td colspan="7">⏳ 불러오는 중...</td></tr>';
+
+        const snap = await getDocs(query(CONTRACTS_REF, orderBy('createdAt', 'desc')));
+        window._allContracts = [];
+        snap.forEach(doc => window._allContracts.push({ id: doc.id, ...doc.data() }));
+
+        updateStats();
+        renderTable();
+    } catch(e) {
+        console.error(e);
+        document.getElementById('contractTable').innerHTML =
+            '<tr class="loading-row"><td colspan="7" style="color:#ef4444">⚠️ 로드 실패: Firebase 권한/설정을 확인하세요</td></tr>';
+    }
+};
+
+function updateStats() {
+    const all = window._allContracts;
+    const now = new Date();
+    document.getElementById('statTotal').textContent = all.length;
+    document.getElementById('statMonth').textContent = all.filter(c => {
+        if (!c.createdAt) return false;
+        const d = c.createdAt.toDate ? c.createdAt.toDate() : new Date(c.createdAt);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    document.getElementById('statIndi').textContent = all.filter(c => c.partnerType === 'individual').length;
+    document.getElementById('statBiz').textContent = all.filter(c => c.partnerType === 'business').length;
+}
+
+window.renderTable = function() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    const filter = window._filter;
+    let data = window._allContracts.filter(c => {
+        if (filter === 'individual' && c.partnerType !== 'individual') return false;
+        if (filter === 'business' && c.partnerType !== 'business') return false;
+        if (q) {
+            const str = `${c.partnerName} ${c.partnerPhone} ${c.address || ''}`.toLowerCase();
+            if (!str.includes(q)) return false;
+        }
+        return true;
+    });
+
+    const tbody = document.getElementById('contractTable');
+    if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="ico">📭</div>데이터가 없습니다</div></td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = data.map((c, i) => {
+        const date = c.createdAt ? (c.createdAt.toDate ? c.createdAt.toDate() : new Date(c.createdAt)).toLocaleDateString('ko-KR') : '-';
+        const typeBadge = c.partnerType === 'individual'
+            ? '<span class="badge badge-indi">개인</span>'
+            : '<span class="badge badge-biz">사업자</span>';
+        const hasFiles = [c.idCardUrl, c.bankBookUrl, c.bizLicUrl].filter(Boolean).length;
+        return `<tr onclick="openDetail('${c.id}')">
+            <td style="color:var(--text3)">${i + 1}</td>
+            <td style="font-weight:600">${c.partnerName || '-'}</td>
+            <td>${c.partnerPhone || '-'}</td>
+            <td>${typeBadge}</td>
+            <td style="color:var(--text2);font-size:12px">${(c.address || '-').slice(0, 20)}${c.address && c.address.length > 20 ? '...' : ''}</td>
+            <td style="color:var(--text2)">${date}</td>
+            <td style="color:var(--text2)">${hasFiles}개</td>
+        </tr>`;
+    }).join('');
+};
+
+window.openDetail = function(id) {
+    const c = window._allContracts.find(x => x.id === id);
+    if (!c) return;
+    window._currentContract = c;
+
+    document.getElementById('modalTitle').textContent = `📋 ${c.partnerName} 계약 상세`;
+
+    // 탭 초기화
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+    document.getElementById('tabPreview').style.display = '';
+    document.getElementById('tabFiles').style.display = 'none';
+
+    // 계약서 미리보기 렌더
+    const date = c.createdAt ? (c.createdAt.toDate ? c.createdAt.toDate() : new Date(c.createdAt)).toLocaleDateString('ko-KR', {year:'numeric',month:'long',day:'numeric'}) : '-';
+    document.getElementById('tabPreview').innerHTML = `
+        <div class="contract-preview" id="contractPreviewContent">
+            <h1>파트너 업무 위탁 계약서</h1>
+            <p><strong>(주)정수기마켓</strong>(이하 "을"이라 한다)와 아래 인적사항의 <strong>파트너</strong>(이하 "갑"이라 한다)는 상호 매출 증대를 도모하기 위하여 다음과 같이 파트너 계약을 체결한다.</p>
+            <h2>[파트너 정보 (갑)]</h2>
+            <table class="preview-table">
+                ${c.partnerType === 'business' ? `<tr><th>상호명</th><td>${c.bizName || '-'}</td></tr><tr><th>사업자등록번호</th><td>${c.bizNum || '-'}</td></tr>` : `<tr><th>주민등록번호</th><td>${c.residentNum || '-'}</td></tr>`}
+                <tr><th>성함 및 서명</th><td>
+                    ${c.partnerName || '-'}
+                    ${c.signatureImg ? `<img src="${c.signatureImg}" class="sig-img" style="margin-left:12px">` : ''}
+                </td></tr>
+                <tr><th>연락처</th><td>${c.partnerPhone || '-'}</td></tr>
+                <tr><th>주소</th><td>${c.address || '-'}</td></tr>
+                <tr><th>파트너 유형</th><td>${c.partnerType === 'individual' ? '개인(프리랜서)' : '사업자(개인/법인)'}</td></tr>
+            </table>
+            <h2>[본사 정보 (을)]</h2>
+            <table class="preview-table">
+                <tr><th>상호(법인명)</th><td>(주)정수기마켓</td></tr>
+                <tr><th>사업자등록번호</th><td>574-86-03026</td></tr>
+                <tr><th>주소</th><td>대전광역시 유성구 유성대로 789 501호</td></tr>
+                <tr><th>대표자</th><td>
+                    <div class="stamp-wrap">
+                        김효상 (인)
+                        <img src="https://raw.githubusercontent.com/a01059651000-creator/rentin/main/%EC%A3%BC%EC%8B%9D%ED%9A%8C%EC%82%AC%20%EC%A0%95%EC%88%98%EA%B8%B0%EB%A7%88%EC%BC%93_%EB%8F%84%EC%9E%A5.png" style="width:48px;height:48px">
+                    </div>
+                </td></tr>
+            </table>
+            <h2>제 1 조 【계약의 목적】</h2>
+            <p>본 계약은 "을"이 취급하는 렌탈 상품에 대하여 "갑"에게 영업 활동을 위탁하고 필요한 제반 사항을 규정함을 목적으로 한다.</p>
+            <h2>제 2 조 【수수료 정산 및 지급】</h2>
+            <p>① 수수료 정산은 "을"이 정한 설치완료 데이터를 기준으로 하며, 익월 말일에 지급한다.<br>
+            ② ${c.partnerType === 'individual' ? '개인 파트너는 수수료 총액에서 13.3%(부가가치세 및 사업소득세 포함)를 공제한 후 지급한다.' : '사업자 파트너는 수수료 총액에 부가가치세(10%)가 포함된 금액으로 정산하며 세금계산서 발행을 원칙으로 한다.'}</p>
+            <h2>제 3 조 【분양몰 구축 및 호스팅 비용】</h2>
+            <p>영업용 분양몰 구축 및 호스팅 임대 비용으로 금 300,000원(VAT별도, 1년 기준)을 최초 1회 "갑"이 "을"에게 지급한다. 해당 비용은 위탁 계약의 필수 조건이며 구축 시작 후 환불 불가하다.</p>
+            <h2>제 6 조 【계약 기간 및 자동 연장】</h2>
+            <p>본 계약은 체결일로부터 1년간 유효하며, 종료 30일 전까지 해지 통보가 없는 한 동일한 조건으로 1년 단위 자동 연장된다.</p>
+            <div style="margin-top:40px;text-align:center;padding-top:20px;border-top:1px solid #eee;font-weight:bold">
+                <div style="font-size:16px;margin-bottom:8px">${date}</div>
+                <p style="font-size:12px;color:#888">(본 계약서는 전자적 방식으로 체결되어 양측이 각각 보관한다)</p>
+            </div>
+        </div>`;
+
+    // 첨부파일 탭 렌더
+    const files = [
+        { label: '신분증 사본', url: c.idCardUrl },
+        { label: '통장 사본', url: c.bankBookUrl },
+        { label: '사업자등록증', url: c.bizLicUrl },
+    ];
+    document.getElementById('tabFiles').innerHTML = `<div class="files-grid">` + files.map(f => {
+        if (!f.url) return `<div class="file-card"><div class="file-thumb-placeholder">📂</div><div class="file-label">${f.label}</div><div class="no-file">미제출</div></div>`;
+        const isPdf = f.url.includes('.pdf') || f.url.includes('%2F') && !f.url.includes('.jpg') && !f.url.includes('.png') && !f.url.includes('.jpeg');
+        return `<div class="file-card">
+            ${isPdf
+                ? `<div class="file-thumb-placeholder">📄</div>`
+                : `<img class="file-thumb" src="${f.url}" alt="${f.label}" onclick="openLightbox('${f.url}',event)">`
+            }
+            <div class="file-label">${f.label}</div>
+            <a href="${f.url}" target="_blank" class="file-open-btn">🔗 원본 열기</a>
+        </div>`;
+    }).join('') + `</div>`;
+
+    document.getElementById('detailModal').classList.add('open');
+};
+</script>
+
+<script>
+// ── 비밀번호 로그인 ──
+const ADMIN_PW = "fpsxmdls11@"; // ← 비밀번호 여기서 변경
+
+function doLogin() {
+    const pw = document.getElementById('pwInput').value;
+    if (pw === ADMIN_PW) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminApp').style.display = 'block';
+        loadContracts();
+    } else {
+        document.getElementById('loginError').textContent = '비밀번호가 올바르지 않습니다.';
+        document.getElementById('pwInput').value = '';
+        setTimeout(() => document.getElementById('loginError').textContent = '', 2500);
+    }
+}
+
+function doLogout() {
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminApp').style.display = 'none';
+    document.getElementById('pwInput').value = '';
+}
+
+// ── 페이지 전환 ──
+function showPage(name) {
+    ['contracts','stats'].forEach(p => {
+        document.getElementById('page-' + p).style.display = p === name ? '' : 'none';
+    });
+    document.querySelectorAll('.nav-item').forEach((el, i) => {
+        el.classList.toggle('active', (i === 0 && name === 'contracts') || (i === 1 && name === 'stats'));
+    });
+}
+
+// ── 필터 ──
+function setFilter(type) {
+    window._filter = type;
+    ['All','Indi','Biz'].forEach(t => document.getElementById('filter'+t).classList.remove('active'));
+    const map = { all: 'All', individual: 'Indi', business: 'Biz' };
+    document.getElementById('filter' + map[type]).classList.add('active');
+    renderTable();
+}
+
+// ── 탭 전환 ──
+function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', (i === 0 && tab === 'preview') || (i === 1 && tab === 'files')));
+    document.getElementById('tabPreview').style.display = tab === 'preview' ? '' : 'none';
+    document.getElementById('tabFiles').style.display = tab === 'files' ? '' : 'none';
+}
+
+// ── 모달 ──
+function closeModal(e) { if (e.target.id === 'detailModal') closeModalDirect(); }
+function closeModalDirect() { document.getElementById('detailModal').classList.remove('open'); }
+
+// ── 라이트박스 ──
+function openLightbox(url, e) {
+    e.stopPropagation();
+    document.getElementById('lightboxImg').src = url;
+    document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('open'); }
+
+// ── PDF 저장 (html2canvas + jsPDF) ──
+async function downloadPDF() {
+    const el = document.getElementById('contractPreviewContent');
+    if (!el) return;
+    const c = window._currentContract;
+    const btn = document.querySelector('.btn-pdf');
+    btn.textContent = '⏳ 생성 중...';
+    btn.disabled = true;
+    try {
+        const canvas = await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+        const imgData = canvas.toDataURL('image/jpeg', 0.92);
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+        const pW = pdf.internal.pageSize.getWidth();
+        const pH = pdf.internal.pageSize.getHeight();
+        const ratio = canvas.height / canvas.width;
+        const imgH = pW * ratio;
+        let posY = 0;
+        if (imgH <= pH) {
+            pdf.addImage(imgData, 'JPEG', 0, 0, pW, imgH);
+        } else {
+            let remaining = imgH;
+            while (remaining > 0) {
+                pdf.addImage(imgData, 'JPEG', 0, posY, pW, imgH);
+                remaining -= pH;
+                posY -= pH;
+                if (remaining > 0) pdf.addPage();
+            }
+        }
+        pdf.save(`계약서_${c.partnerName}_${new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','')}.pdf`);
+    } catch(e) {
+        alert('PDF 생성 중 오류: ' + e.message);
+    } finally {
+        btn.textContent = '📥 PDF 저장';
+        btn.disabled = false;
+    }
+}
+</script>
 </body>
 </html>
