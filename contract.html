@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>정수기마켓 파트너 위탁 계약서</title>
+    <!-- 다음 주소 API -->
+    <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+    
+    <!-- Firebase SDK 연동 -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
+
+        // Firebase 설정
+        const firebaseConfig = {
+            apiKey: "AIzaSyD3A4xrFozCh10clw6hzhrgD7rRvXGojIU",
+            authDomain: "rentinp-172dd.firebaseapp.com",
+            projectId: "rentinp-172dd",
+            storageBucket: "rentinp-172dd.firebasestorage.app",
+            messagingSenderId: "176082975122",
+            appId: "1:176082975122:web:b792b8ad175dfa6bb7e94b",
+            measurementId: "G-2280HE41YD"
+        };
+
+        const TELEGRAM_TOKEN = "8575001534:AAH9fUPVDfXmO2a_JcY0pdSD_S7V9tvSoTo";
+        const TELEGRAM_CHAT_ID = "5369835092";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        const appId = "rentinp-172dd"; 
+
+        async function sendTelegram(msg) {
+            const url = `https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage`;
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msg, parse_mode: 'HTML' })
+                });
+            } catch (e) { console.error("알림 전송 실패", e); }
+        }
+
+        async function uploadFile(file) {
+            if (!file) return null;
+            const fileRef = ref(storage, `artifacts/${appId}/public/data/partner_docs/${Date.now()}_${file.name}`);
+            await uploadBytes(fileRef, file);
+            return await getDownloadURL(fileRef);
+        }
+
+        window.submitFinalContract = async function() {
+            const name = document.getElementById('partnerName').value;
+            const phone = document.getElementById('partnerPhone').value;
+            
+            if (!name || !phone) { alert("인적사항을 모두 입력해주세요."); return; }
+            if (!window.hasSigned) { alert("서명란에 서명을 완료해주세요."); return; }
+            
+            const btn = document.querySelector('.btn-final');
+            const idCardFile = document.getElementById('idCard').files[0];
+            const bankBookFile = document.getElementById('bankBook').files[0];
+            const bizLicFile = document.getElementById('bizLicense').files[0];
+
+            if (!idCardFile || !bankBookFile) {
+                alert("신분증 사본과 통장 사본은 필수 업로드 항목입니다.");
+                return;
+            }
+            if (window.partnerType === 'business' && !bizLicFile) {
+                alert("사업자 파트너는 사업자등록증 사본을 반드시 업로드해야 합니다.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "⏳ 서버 전송 중 (잠시만 기다려주세요)...";
+
+            try {
+                await signInAnonymously(auth);
+
+                const idCardUrl = await uploadFile(idCardFile);
+                const bankBookUrl = await uploadFile(bankBookFile);
+                const bizLicUrl = await uploadFile(bizLicFile);
+                const signatureImg = document.getElementById('signaturePad').toDataURL();
+
+                const docData = {
+                    partnerName: name,
+                    partnerPhone: phone,
+                    partnerType: window.partnerType,
+                    address: document.getElementById('roadAddress').value + " " + document.getElementById('detailAddress').value,
+                    bizNum: window.partnerType === 'business' ? document.getElementById('partner_biz_num').value : "",
+                    residentNum: window.partnerType === 'individual' ? document.getElementById('partner_resident_num').value : "",
+                    idCardUrl, bankBookUrl, bizLicUrl, signatureImg,
+                    createdAt: serverTimestamp()
+                };
+
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'contracts'), docData);
+
+                const msg = `🚨 <b>새로운 파트너 계약 접수!</b>\n\n<b>상호/성함:</b> ${name}\n<b>연락처:</b> ${phone}\n<b>유형:</b> ${window.partnerType === 'individual' ? '개인' : '사업자'}\n\n서류가 구글 클라우드 금고에 안전하게 저장되었습니다.`;
+                await sendTelegram(msg);
+
+                alert("🎉 계약 정보가 서버로 안전하게 전송되었습니다!\n대표님께 즉시 알림이 전송되었습니다. 확인을 누르면 보관용 인쇄 창이 열립니다.");
+                window.print();
+            } catch (e) {
+                console.error(e);
+                alert("전송 중 오류가 발생했습니다. 파이어베이스 설정을 확인해 주세요.");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "🚀 최종 계약 완료 및 서류 제출";
+            }
+        };
+    </script>
+
+    <style>
+        body { font-family: 'Pretendard', sans-serif; background: #f0f2f5; padding: 20px; display: flex; flex-direction: column; align-items: center; margin: 0; color: #333; }
+        .a4-paper { background: white; width: 100%; max-width: 210mm; min-height: 297mm; padding: 20mm 15mm; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 4px; position: relative; margin-bottom: 20px; }
+        h1 { text-align: center; font-size: 26px; margin-bottom: 30px; border-bottom: 2px solid #222; padding-bottom: 15px; letter-spacing: 1px; }
+        h2 { font-size: 16px; margin-top: 25px; border-left: 5px solid #2c3e50; padding-left: 10px; color: #2c3e50; font-weight: bold; margin-bottom: 10px; }
+        p, li { font-size: 13px; line-height: 1.7; margin: 8px 0; text-align: justify; word-break: keep-all; }
+        ul { padding-left: 20px; margin: 10px 0; font-size: 12.5px; }
+        
+        .info-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; table-layout: fixed; }
+        .info-table th, .info-table td { border: 1px solid #ddd; padding: 10px; font-size: 13px; vertical-align: middle; }
+        .info-table th { background-color: #f8f9fa; width: 30%; text-align: left; font-weight: 600; }
+        .info-table input { width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; box-sizing: border-box; outline: none; }
+        
+        .name-sig-container { display: flex; align-items: center; gap: 10px; }
+        .name-sig-container input { flex: 1; min-width: 120px; }
+        .canvas-wrap { border: 1px dashed #bdc3c7; background: #fafafa; border-radius: 4px; position: relative; width: 150px; height: 60px; flex-shrink: 0; }
+        canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
+        .clear-btn { position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.05); border: none; font-size: 9px; padding: 1px 4px; cursor: pointer; color: #888; }
+
+        .hq-rep-wrap { display: flex; align-items: center; gap: 5px; position: relative; }
+        .stamp-img { width: 55px; height: 55px; opacity: 0.95; margin-left: -5px; }
+
+        .type-selector { display: flex; gap: 8px; margin-bottom: 15px; width: 100%; max-width: 210mm; }
+        .type-btn { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 6px; background: #fff; cursor: pointer; font-size: 14px; font-weight: bold; transition: 0.2s; text-align: center; }
+        .type-btn.active { background: #2c3e50; color: #fff; border-color: #2c3e50; }
+
+        .btn-address { background: #34495e; color: #fff; border: none; padding: 5px 8px; font-size: 11px; border-radius: 4px; cursor: pointer; margin-bottom: 5px; }
+
+        .upload-area { margin-top: 15px; width: 100%; max-width: 210mm; padding: 20px; background: #fff; border-radius: 6px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); box-sizing: border-box; border: 1px solid #eee; }
+        .upload-area h3 { margin-top: 0; font-size: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .upload-area label { display: block; margin-top: 12px; font-weight: bold; font-size: 13px; }
+        .upload-area input[type="file"] { margin-top: 5px; width: 100%; font-size: 12px; }
+
+        .submit-wrap { width: 100%; max-width: 210mm; margin: 20px 0 50px; }
+        .btn-final { width: 100%; padding: 20px; background: #2c3e50; color: #fff; border: none; border-radius: 8px; font-size: 17px; font-weight: bold; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .btn-final:disabled { background: #ccc; cursor: not-allowed; }
+
+        .hidden { display: none !important; }
+
+        @media screen and (max-width: 768px) {
+            body { padding: 10px; background: #fff; }
+            .a4-paper { padding: 20px; box-shadow: none; border-radius: 0; }
+            h1 { font-size: 20px; }
+            .info-table tr, .info-table th, .info-table td { display: block; width: 100%; }
+            .info-table th { border: none; border-bottom: 2px solid #2c3e50; padding: 6px 0; background: transparent; }
+            .info-table td { border: none; padding: 5px 0 15px 0; }
+            .name-sig-container { flex-direction: column; align-items: flex-start; }
+            .canvas-wrap { width: 100%; height: 80px; }
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .a4-paper { box-shadow: none; width: 100%; margin: 0; padding: 10mm; }
+            .no-print, .type-selector, .upload-area, .submit-wrap, .clear-btn { display: none !important; }
+            .info-table input { border: none !important; font-weight: bold !important; background: transparent !important; }
+            .canvas-wrap { border: none !important; background: transparent !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="type-selector no-print">
+    <button type="button" class="type-btn active" id="type-indi" onclick="changeType('individual')">개인 (프리랜서)</button>
+    <button type="button" class="type-btn" id="type-biz" onclick="changeType('business')">사업자 (개인/법인)</button>
+</div>
+
+<div class="a4-paper">
+    <h1>파트너 업무 위탁 계약서</h1>
+
+    <p><strong>(주)정수기마켓</strong>(이하 “을”이라 한다)와 아래 인적사항의 <strong>파트너</strong>(이하 “갑”이라 한다)는 상호 매출 증대를 도모하기 위하여 다음과 같이 파트너 계약을 체결한다.</p>
+
+    <h2>[파트너 정보 (갑)]</h2>
+    <table class="info-table">
+        <tr id="field-biz-name" class="hidden"><th>상호명</th><td><input type="text" id="partner_biz_name" placeholder="상호명을 입력하세요"></td></tr>
+        <tr id="field-biz-num" class="hidden"><th>사업자등록번호</th><td><input type="text" id="partner_biz_num" placeholder="000-00-00000"></td></tr>
+        <tr id="field-resident-num"><th>주민등록번호</th><td><input type="text" id="partner_resident_num" placeholder="원천세 신고용 (13자리 전체)"></td></tr>
+        <tr>
+            <th>성함 및 서명</th>
+            <td>
+                <div class="name-sig-container">
+                    <input type="text" id="partnerName" placeholder="실명을 입력하세요">
+                    <div class="canvas-wrap no-print">
+                        <button type="button" class="clear-btn" onclick="clearSig()">지우기</button>
+                        <canvas id="signaturePad"></canvas>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr><th>연락처</th><td><input type="tel" id="partnerPhone" placeholder="010-0000-0000"></td></tr>
+        <tr>
+            <th>주소</th>
+            <td>
+                <button type="button" class="btn-address no-print" onclick="searchAddress()">주소 검색</button>
+                <input type="text" id="postcode" readonly style="width: 80px; margin-bottom: 5px;"><br>
+                <input type="text" id="roadAddress" readonly style="margin-bottom: 5px;"><br>
+                <input type="text" id="detailAddress" placeholder="상세 주소를 입력하세요">
+            </td>
+        </tr>
+    </table>
+
+    <h2>[본사 정보 (을)]</h2>
+    <table class="info-table">
+        <tr><th>상호 (법인명)</th><td>(주)정수기마켓</td></tr>
+        <tr><th>사업자등록번호</th><td>574-86-03026</td></tr>
+        <tr><th>주소</th><td>대전광역시 유성구 유성대로 789 501호</td></tr>
+        <tr>
+            <th>대표자</th>
+            <td>
+                <div class="hq-rep-wrap">
+                    <span>김효상 (인)</span>
+                    <img src="https://raw.githubusercontent.com/a01059651000-creator/rentin/main/%EC%A3%BC%EC%8B%9D%ED%9A%8C%EC%82%AC%20%EC%A0%95%EC%88%98%EA%B8%B0%EB%A7%88%EC%BC%93_%EB%8F%84%EC%9E%A5.png" class="stamp-img" alt="직인">
+                </div>
+            </td>
+        </tr>
+    </table>
+
+    <h2>제 1 조 【계약의 목적】</h2>
+    <p>본 계약은 “을”이 취급하는 렌탈 상품에 대하여 “갑”에게 영업 활동을 위탁하고 필요한 제반 사항을 규정함을 목적으로 한다.</p>
+
+    <h2>제 2 조 【수수료 정산 및 지급】</h2>
+    <p>① 수수료 정산은 “을”이 정한 설치완료 데이터를 기준으로 하며, 익월 말일에 지급한다.<br>② 개인 파트너는 수수료 총액에서 13.3%(부가가치세 및 사업소득세 포함)를 공제한 후 지급하며, 사업자 파트너는 수수료 총액에 부가가치세(10%)가 포함된 금액으로 정산하며 세금계산서 발행을 원칙으로 한다.</p>
+
+    <h2>제 3 조 【분양몰 구축 및 호스팅 비용】</h2>
+    <p>① 영업용 분양몰 구축 및 호스팅 임대 비용으로 금 300,000원(VAT별도, 1년 기준)을 최초 1회 “갑”이 “을”에게 지급한다. 해당 비용은 위탁 계약의 필수 조건이며 구축 시작 후 환불 불가하다.<br>② 본 비용은 1년 단위 계약 기준이며, 계약 갱신 시 별도 협의를 통해 재산정될 수 있다.</p>
+
+    <h2>제 4 조 【수수료의 환수】</h2>
+    <p>고객의 렌탈 약정 기간 내 중도 해지, 철회 시 기 지급된 수수료는 렌탈사 정책에 따라 환수(대물림)되며 “갑”은 이를 반환할 의무가 있다. 단, 환수 규정이 없는 렌탈사는 예외로 한다.</p>
+
+    <h2>제 5 조 【개인정보 보호 및 기밀 유지】</h2>
+    <p>“갑”은 업무 수행 중 취득한 모든 고객 정보를 관련 법령에 따라 보호하여야 하며, 영업 목적 외 사용이나 외부 유출 시 모든 책임을 진다.</p>
+
+    <h2>제 6 조 【계약 기간 및 자동 연장】</h2>
+    <p>본 계약은 체결일로부터 1년간 유효하며, 종료 30일 전까지 해지 통보가 없는 한 동일한 조건으로 1년 단위 자동 연장된다.</p>
+
+    <h2>제 7 조 【계약의 해지】</h2>
+    <p>상대방의 명예 실추, 기밀 누설, 실적 저조, 타사 영업 활동, 임직원 오인 직책 사용 등 신뢰 관계를 저해하는 행위 발생 시 “을”은 본 계약을 즉시 해지할 수 있다.</p>
+
+    <h2>제 8 조 【비밀의 유지】</h2>
+    <p>“갑”은 본 계약 이행 중 알게 된 업무상 비밀과 고객 정보를 본 업무 외 용도로 사용할 수 없으며 제3자에게 누설해서는 아니 된다. 위반 시 민형사상 모든 책임을 진다.</p>
+
+    <h2>제 9 조 【해석 및 관할법원】</h2>
+    <p>본 계약에 대한 이의 발생 시 상호 협의하되 협의 불능 시 관할법원은 “을”의 소재지 관할법원으로 한다.</p>
+
+    <h2>제 10 조 【특약사항】</h2>
+    <p>상기 일반사항 이외에 별지나 합의된 특약이 있는 경우 이를 우선 적용하며, “갑”은 구축에 필요한 자료를 성실히 제공해야 한다.</p>
+
+    <div style="margin-top: 50px; text-align: center; font-weight: bold; border-top: 1px solid #eee; padding-top: 30px;">
+        <div id="currentDate" style="font-size: 18px; margin-bottom: 10px;"></div>
+        <p>(본 계약서는 전자적 방식으로 체결되어 양측이 각각 보관한다)</p>
+    </div>
+</div>
+
+<div class="upload-area no-print">
+    <h3>📂 필수 서류 제출</h3>
+    <label>1. 신분증 사본 (전체 번호 필수)</label><input type="file" id="idCard" accept="image/*, .pdf">
+    <label id="label-biz-file" class="hidden">2. 사업자등록증 사본</label><input type="file" id="bizLicense" class="hidden" accept="image/*, .pdf">
+    <label>3. 수수료 입금용 통장사본</label><input type="file" id="bankBook" accept="image/*, .pdf">
+</div>
+
+<div class="submit-wrap no-print">
+    <button type="button" class="btn-final" onclick="submitFinalContract()">🚀 최종 계약 완료 및 서류 제출</button>
+</div>
+
+<script>
+    const today = new Date();
+    document.getElementById('currentDate').innerText = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+
+    const canvas = document.getElementById('signaturePad');
+    const ctx = canvas.getContext('2d');
+    let drawing = false; window.hasSigned = false;
+
+    function resizeCanvas() { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; }
+    window.addEventListener('load', resizeCanvas); window.addEventListener('resize', resizeCanvas);
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        return { x: (clientX - rect.left) * (canvas.width / rect.width), y: (clientY - rect.top) * (canvas.height / rect.height) };
+    }
+    canvas.addEventListener('mousedown', (e) => { drawing = true; window.hasSigned = true; draw(e); });
+    window.addEventListener('mouseup', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('touchstart', (e) => { drawing = true; window.hasSigned = true; if (canvas.width === 0) resizeCanvas(); draw(e); }, {passive: false});
+    canvas.addEventListener('touchend', () => { drawing = false; ctx.beginPath(); });
+    canvas.addEventListener('touchmove', draw, {passive: false});
+    function draw(e) { if (!drawing) return; if (e.type === 'touchmove') e.preventDefault(); const { x, y } = getPos(e); ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.strokeStyle = '#000'; ctx.lineTo(x, y); ctx.stroke(); ctx.beginPath(); ctx.moveTo(x, y); }
+    window.clearSig = () => { ctx.clearRect(0, 0, canvas.width, canvas.height); window.hasSigned = false; };
+    window.searchAddress = () => { new daum.Postcode({ oncomplete: (data) => { document.getElementById('postcode').value = data.zonecode; document.getElementById('roadAddress').value = data.address; document.getElementById('detailAddress').focus(); }}).open(); };
+    window.partnerType = 'individual';
+    window.changeType = (type) => {
+        window.partnerType = type;
+        document.getElementById('type-indi').classList.toggle('active', type === 'individual');
+        document.getElementById('type-biz').classList.toggle('active', type === 'business');
+        document.getElementById('field-biz-name').classList.toggle('hidden', type === 'individual');
+        document.getElementById('field-biz-num').classList.toggle('hidden', type === 'individual');
+        document.getElementById('field-resident-num').classList.toggle('hidden', type === 'business');
+        document.getElementById('label-biz-file').classList.toggle('hidden', type === 'individual');
+        document.getElementById('bizLicense').classList.toggle('hidden', type === 'individual');
+    };
+</script>
+
+</body>
+</html>
