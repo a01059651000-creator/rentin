@@ -609,5 +609,42 @@
             });
         });
     </script>
+<!-- 고정 창업자료 버튼 -->
+<a href="https://rentin.life/guide" target="_blank" id="floatBtn2" style="
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: white;
+  color: #1a1a2e;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 10px 16px;
+  border-radius: 10px;
+  text-decoration: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  border: 1.5px solid #eee;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.25s;
+  white-space: nowrap;
+">
+  창업 자료 보기
+  <span style="color:#e8004d; font-size:14px; font-weight:900;">›</span>
+</a>
+<script>
+  var fb2 = document.getElementById('floatBtn2');
+  fb2.addEventListener('mouseover', function() {
+    this.style.transform = 'translateY(-3px)';
+    this.style.boxShadow = '0 8px 24px rgba(0,0,0,0.2)';
+    this.style.borderColor = '#e8004d';
+  });
+  fb2.addEventListener('mouseout', function() {
+    this.style.transform = 'translateY(0)';
+    this.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
+    this.style.borderColor = '#eee';
+  });
+</script>
 </body>
 </html>
