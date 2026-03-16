@@ -139,6 +139,55 @@ body{
 }
 .cat-btn:hover{background:rgba(255,255,255,0.06);color:var(--text);}
 .cat-btn.del:hover{color:var(--red);}
+.drag-handle{cursor:grab;color:var(--text3);font-size:14px;padding:5px 4px;opacity:0.4;transition:.15s;}
+.drag-handle:hover{opacity:1;color:var(--text);}
+.drag-handle:active{cursor:grabbing;}
+
+.todo-wrap{max-width:700px;margin:0 auto;}
+.todo-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+.todo-title{font-size:18px;font-weight:800;color:#fff;}
+.todo-empty{text-align:center;padding:48px;color:var(--text3);font-size:14px;}
+
+.todo-item{
+  background:var(--glass);backdrop-filter:blur(24px);
+  border:1px solid var(--border);border-radius:16px;
+  padding:18px 20px;margin-bottom:10px;
+  transition:all .2s;position:relative;
+}
+.todo-item::before{
+  content:'';position:absolute;inset:0;border-radius:16px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.04) 0%,transparent 50%);
+  pointer-events:none;
+}
+.todo-item.done{opacity:0.45;}
+.todo-item.done .todo-name{text-decoration:line-through;color:var(--text3);}
+.todo-item-top{display:flex;align-items:flex-start;gap:12px;}
+.todo-check{
+  width:22px;height:22px;border-radius:6px;
+  border:2px solid var(--border2);
+  background:transparent;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:.2s;margin-top:1px;
+}
+.todo-check.checked{background:linear-gradient(135deg,var(--accent),var(--accent2));border-color:transparent;}
+.todo-check.checked::after{content:'✓';color:#fff;font-size:13px;font-weight:900;}
+.todo-info{flex:1;}
+.todo-name{font-size:15px;font-weight:700;color:#fff;margin-bottom:4px;}
+.todo-content{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:6px;}
+.todo-time{font-size:12px;color:var(--accent);font-weight:600;display:flex;align-items:center;gap:4px;}
+.todo-time.past{color:var(--red);}
+.todo-actions{display:flex;gap:4px;flex-shrink:0;}
+.todo-btn{background:transparent;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:4px 7px;border-radius:7px;transition:.15s;}
+.todo-btn:hover{background:rgba(255,255,255,0.06);color:var(--text);}
+.todo-btn.del:hover{color:var(--red);}
+.todo-done-clear{
+  width:100%;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.15);
+  border-radius:10px;padding:10px;color:var(--red);font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit;margin-top:8px;transition:.2s;
+}
+.todo-done-clear:hover{background:rgba(239,68,68,0.15);}
+.sortable-ghost{opacity:0.3;}
+.sortable-chosen{opacity:0.8;}
 
 /* 북마크 */
 .bm-list{padding:8px 10px;}
@@ -334,6 +383,7 @@ body{
   .cat-actions{opacity:1;}
 }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
 </head>
 <body>
 
@@ -363,12 +413,24 @@ body{
   <!-- 탭 -->
   <div class="tabs">
     <button class="tab active" onclick="switchTab('bookmark')">🔖 북마크</button>
+    <button class="tab" onclick="switchTab('todo')">✅ 할일</button>
     <button class="tab" onclick="switchTab('calc')">🧮 수수료 계산기</button>
   </div>
 
   <!-- 그리드 -->
   <div id="tabBookmark">
   <div class="grid" id="grid"></div>
+  </div>
+
+  <!-- 할일 -->
+  <div id="tabTodo" style="display:none;">
+    <div class="todo-wrap">
+      <div class="todo-top">
+        <h2 class="todo-title">✅ 할일 목록</h2>
+        <button class="tbtn" onclick="openAddTodo()">+ 할일 추가</button>
+      </div>
+      <div id="todoList"></div>
+    </div>
   </div>
 
   <!-- 수수료 계산기 -->
@@ -407,6 +469,29 @@ body{
         </div>
         <div class="calc-tip">※ 수수료율은 렌탈사마다 다릅니다. 직접 입력하세요.</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 할일 추가 모달 -->
+<div class="modal-overlay" id="todoModal">
+  <div class="modal">
+    <h3 id="todoModalTitle">할일 추가</h3>
+    <div class="mfield">
+      <label>제목</label>
+      <input type="text" id="todoName" placeholder="할일 제목">
+    </div>
+    <div class="mfield">
+      <label>내용</label>
+      <input type="text" id="todoContent" placeholder="상세 내용 (선택)">
+    </div>
+    <div class="mfield">
+      <label>알림 날짜/시간</label>
+      <input type="datetime-local" id="todoTime">
+    </div>
+    <div class="mbtns">
+      <button class="btn-cancel" onclick="closeModal('todoModal')">취소</button>
+      <button class="btn-ok" onclick="saveTodo()">저장</button>
     </div>
   </div>
 </div>
@@ -554,6 +639,7 @@ function renderAll(){
 
     const card = document.createElement('div');
     card.className = 'cat-card';
+    card.setAttribute('data-id', cat.id);
     card.innerHTML = `
       <div class="cat-header">
         <div class="cat-title-wrap">
@@ -564,6 +650,7 @@ function renderAll(){
           </div>
         </div>
         <div class="cat-actions">
+          <span class="drag-handle cat-drag" title="드래그로 이동">⠿</span>
           <button class="cat-btn" onclick="openEditCat('${cat.id}')" title="수정">✏️</button>
           <button class="cat-btn del" onclick="deleteCat('${cat.id}')" title="삭제">🗑️</button>
         </div>
@@ -581,6 +668,7 @@ function renderAll(){
         const fav = getFavicon(bm.url);
         const a = document.createElement('a');
         a.className='bm-item';
+        a.setAttribute('data-id', bm.id);
         a.href=bm.url;
         a.target='_blank';
         a.rel='noopener';
@@ -596,6 +684,48 @@ function renderAll(){
         list.appendChild(a);
       });
     }
+  });
+
+  // Sortable - 카테고리 순서
+  const gridEl = document.getElementById('grid');
+  new Sortable(gridEl, {
+    handle: '.cat-drag',
+    animation: 150,
+    ghostClass: 'sortable-ghost',
+    chosenClass: 'sortable-chosen',
+    filter: '.add-cat-card',
+    onEnd: async function() {
+      const cards = gridEl.querySelectorAll('.cat-card');
+      const newOrder = [];
+      cards.forEach(card => {
+        const id = card.getAttribute('data-id');
+        const cat = data.find(c => c.id === id);
+        if(cat) newOrder.push(cat);
+      });
+      data = newOrder;
+      await save();
+    }
+  });
+
+  // Sortable - 북마크 순서 (각 카테고리별)
+  data.forEach(cat => {
+    const listEl = document.getElementById(`bml-${cat.id}`);
+    if(!listEl) return;
+    new Sortable(listEl, {
+      animation: 150,
+      ghostClass: 'sortable-ghost',
+      onEnd: async function() {
+        const items = listEl.querySelectorAll('.bm-item');
+        const newOrder = [];
+        items.forEach(item => {
+          const id = item.getAttribute('data-id');
+          const bm = cat.bookmarks.find(b => b.id === id);
+          if(bm) newOrder.push(bm);
+        });
+        cat.bookmarks = newOrder;
+        await save();
+      }
+    });
   });
 
   // 카테고리 추가 카드
@@ -712,12 +842,154 @@ function tick(){
 tick();
 setInterval(tick,1000);
 
+// 할일 데이터
+let todos = [];
+
+async function loadTodos(){
+  try{
+    const res = await fetch(`${SB_URL}/rest/v1/bookmarks?id=eq.todos`, {
+      headers:{ 'apikey':SB_KEY, 'Authorization':`Bearer ${SB_KEY}` }
+    });
+    const rows = await res.json();
+    if(rows && rows.length > 0 && rows[0].data){
+      todos = rows[0].data;
+    }
+  }catch(e){ console.log('할일 로드 실패'); }
+  renderTodos();
+}
+
+async function saveTodos(){
+  try{
+    await fetch(`${SB_URL}/rest/v1/bookmarks`, {
+      method:'POST',
+      headers:{
+        'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,
+        'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'
+      },
+      body: JSON.stringify({ id:'todos', data:todos, updated_at: new Date().toISOString() })
+    });
+  }catch(e){ console.log('할일 저장 실패'); }
+}
+
+function renderTodos(){
+  const list = document.getElementById('todoList');
+  if(!list) return;
+  if(todos.length === 0){
+    list.innerHTML = '<div class="todo-empty">할일이 없습니다 😊</div>';
+    return;
+  }
+  // 미완료 먼저, 완료 나중
+  const sorted = [...todos].sort((a,b) => {
+    if(a.done === b.done) return new Date(a.time) - new Date(b.time);
+    return a.done ? 1 : -1;
+  });
+  list.innerHTML = '';
+  sorted.forEach(todo => {
+    const isPast = todo.time && new Date(todo.time) < new Date() && !todo.done;
+    const timeStr = todo.time ? new Date(todo.time).toLocaleString('ko-KR',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    const div = document.createElement('div');
+    div.className = 'todo-item' + (todo.done ? ' done' : '');
+    div.innerHTML = `
+      <div class="todo-item-top">
+        <div class="todo-check ${todo.done?'checked':''}" onclick="toggleTodo('${todo.id}')"></div>
+        <div class="todo-info">
+          <div class="todo-name">${todo.name}</div>
+          ${todo.content ? `<div class="todo-content">${todo.content}</div>` : ''}
+          ${timeStr ? `<div class="todo-time ${isPast?'past':''}">⏰ ${timeStr}${isPast?' · 지남':''}</div>` : ''}
+        </div>
+        <div class="todo-actions">
+          <button class="todo-btn del" onclick="deleteTodo('${todo.id}')">🗑️</button>
+        </div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  // 완료된 항목 있으면 일괄삭제 버튼
+  if(todos.some(t=>t.done)){
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'todo-done-clear';
+    clearBtn.textContent = '✓ 완료된 항목 전체 삭제';
+    clearBtn.onclick = clearDoneTodos;
+    list.appendChild(clearBtn);
+  }
+}
+
+function openAddTodo(){
+  document.getElementById('todoModalTitle').textContent = '할일 추가';
+  document.getElementById('todoName').value = '';
+  document.getElementById('todoContent').value = '';
+  // 기본값: 1시간 후
+  const d = new Date(Date.now() + 3600000);
+  const local = new Date(d.getTime() - d.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('todoTime').value = local;
+  document.getElementById('todoModal').classList.add('open');
+  setTimeout(()=>document.getElementById('todoName').focus(),100);
+}
+
+async function saveTodo(){
+  const name = document.getElementById('todoName').value.trim();
+  if(!name){ alert('제목을 입력해주세요.'); return; }
+  const content = document.getElementById('todoContent').value.trim();
+  const time = document.getElementById('todoTime').value;
+  const todoId = uid();
+
+  todos.push({ id:todoId, name, content, time, done:false, created: new Date().toISOString() });
+  await saveTodos();
+
+  // 알림 시간 있으면 todos_alert 테이블에도 저장 (2시간 전 알림)
+  if(time){
+    try{
+      const alertTime = new Date(new Date(time).getTime() - 2 * 60 * 60 * 1000).toISOString();
+      await fetch(`${SB_URL}/rest/v1/todos_alert`, {
+        method:'POST',
+        headers:{
+          'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,
+          'Content-Type':'application/json','Prefer':'return=minimal'
+        },
+        body: JSON.stringify({ id:todoId, name, content, alert_time:alertTime, sent:false })
+      });
+    }catch(e){ console.log('알림 저장 실패'); }
+  }
+
+  renderTodos();
+  closeModal('todoModal');
+}
+
+async function toggleTodo(id){
+  const todo = todos.find(t=>t.id===id);
+  if(todo) todo.done = !todo.done;
+  await saveTodos();
+  renderTodos();
+}
+
+async function deleteTodo(id){
+  todos = todos.filter(t=>t.id!==id);
+  await saveTodos();
+  // todos_alert에서도 삭제
+  try{
+    await fetch(`${SB_URL}/rest/v1/todos_alert?id=eq.${id}`, {
+      method:'DELETE',
+      headers:{ 'apikey':SB_KEY, 'Authorization':`Bearer ${SB_KEY}` }
+    });
+  }catch(e){}
+  renderTodos();
+}
+
+async function clearDoneTodos(){
+  if(!confirm('완료된 항목을 모두 삭제할까요?')) return;
+  todos = todos.filter(t=>!t.done);
+  await saveTodos();
+  renderTodos();
+}
+
 function switchTab(tab){
   document.getElementById('tabBookmark').style.display = tab==='bookmark' ? 'block' : 'none';
+  document.getElementById('tabTodo').style.display = tab==='todo' ? 'block' : 'none';
   document.getElementById('tabCalc').style.display = tab==='calc' ? 'block' : 'none';
   document.querySelectorAll('.tab').forEach((t,i)=>{
-    t.classList.toggle('active', (tab==='bookmark'&&i===0)||(tab==='calc'&&i===1));
+    t.classList.toggle('active', (tab==='bookmark'&&i===0)||(tab==='todo'&&i===1)||(tab==='calc'&&i===2));
   });
+  if(tab==='todo') renderTodos();
 }
 
 function calcFee(){
@@ -740,6 +1012,7 @@ function calcFee(){
 }
 
 load();
+loadTodos();
 </script>
 </body>
 </html>
