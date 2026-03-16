@@ -946,7 +946,7 @@ async function saveTodo(){
           'apikey':SB_KEY,'Authorization':`Bearer ${SB_KEY}`,
           'Content-Type':'application/json','Prefer':'return=minimal'
         },
-        body: JSON.stringify({ id:todoId, name, content, alert_time:alertTime, sent:false })
+        body: JSON.stringify({ id:todoId, name, content, alert_time:alertTime, sent:false, todo_time:new Date(time).toISOString() })
       });
     }catch(e){ console.log('알림 저장 실패'); }
   }
